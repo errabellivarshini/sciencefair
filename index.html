@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroBot- Smart AI for Farmers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #f0f4f8; /* Soft cloud blue-gray */
+            --bg-secondary: #e2e8f0;
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --accent-primary: #10b981; /* Friendly Emerald */
+            --accent-secondary: #3b82f6; /* Friendly Blue */
+            --text-primary: #1e293b; /* Slate 800 */
+            --text-secondary: #64748b; /* Slate 500 */
+            --text-muted: #94a3b8;
+            --border-color: #cbd5e1;
+            --shadow-color: rgba(148, 163, 184, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .font-display {
+            font-family: 'Orbitron', monospace;
+        }
+        
+        /* Animated background */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(46, 204, 113, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(52, 152, 219, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .bg-gradient-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 10% 10%, rgba(46, 204, 113, 0.1) 0%, transparent 50%),
+                        radial-gradient(ellipse at 90% 90%, rgba(52, 152, 219, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Robot container */
+        #robot-container {
+            width: 100%;
+            height: 600px;
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            background: transparent;
+        }
+        
+        /* Soil dashboard */
+        .soil-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        
+        .soil-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 8px 25px var(--shadow-color);
+        }
+        
+        .radial-progress {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(var(--accent-color, var(--accent-primary)) calc(var(--value) * 1%), var(--bg-secondary) 0);
+            transition: all 0.5s ease;
+            flex-shrink: 0;
+        }
+
+        .radial-progress::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            background: var(--bg-card);
+            border-radius: 50%;
+        }
+
+        .radial-progress-content {
+            position: relative;
+            text-align: center;
+        }
+
+        .radial-progress-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+            color: var(--text-primary);
+        }
+        
+        /* Progress bars */
+        .progress-track {
+            background: var(--bg-primary);
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            position: relative;
+            transition: width 1s ease;
+        }
+        
+        /* Chat interface */
+        .chat-container {
+            background: var(--bg-card);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .chat-header {
+            background: var(--bg-card);
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 500px;
+        }
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        
+        .message {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            animation: messageIn 0.4s ease;
+        }
+        
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message-bot {
+            background: var(--bg-secondary);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+        
+        .message-user {
+            background: var(--accent-primary);
+            color: #fff;
+            font-weight: 500;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+        }
+        
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-card);
+        }
+        
+        .chat-input {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: var(--text-primary);
+            width: 100%;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3);
+        }
+        
+        .chat-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .send-btn {
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 24px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+            background: #27ae60;
+        }
+        
+        .send-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* Weather panel */
+        .weather-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 360px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.98);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+        
+        .weather-panel.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        
+        .weather-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .weather-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        
+        /* Voice & Language Controls */
+        .voice-btn {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .voice-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        .voice-btn.listening {
+            border-color: #ef4444;
+            color: #ef4444;
+            animation: pulse-red 1.5s infinite;
+        }
+        .voice-btn.speaking {
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+        }
+        .voice-btn.muted {
+            color: var(--text-muted);
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        
+        .lang-select {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            color: var(--text-primary);
+            outline: none;
+            cursor: pointer;
+            margin-left: auto;
+        }
+        .dialect-select {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            color: var(--text-primary);
+            outline: none;
+            cursor: pointer;
+        }
+        
+        /* Feature cards */
+        .feature-card {
+            background: var(--bg-card);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .feature-card .feature-icon {
+            transition: transform 0.4s ease;
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 8px 25px var(--shadow-color);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 24px;
+        }
+        
+        /* Indicator dots */
+        .indicator-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+            width: fit-content;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+        
+        /* Quick action buttons */
+        .quick-action {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .quick-action:hover {
+            background: var(--accent-primary);
+            color: #fff;
+            border-color: var(--accent-primary);
+        }
+        
+        /* Status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-online {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+        
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.3;
+            z-index: 1;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+        }
+        
+        @media (max-width: 640px) {
+            .weather-panel {
+                width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+            }
+            
+            #robot-container {
+                height: 350px;
+            }
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background effects -->
+    <div class="bg-grid"></div>
+    <div class="bg-gradient-overlay"></div>
+    
+    <!-- Floating particles container -->
+    <div id="particles"></div>
+    
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-md border-b border-[var(--border-color)]" style="background: rgba(255, 255, 255, 0.8);">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center shadow-lg shadow-[var(--shadow-color)]">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                        <path d="M12 21v-2m0-14V3m9-2v2m-1.4-1.4l-1.44 1.44M4.84 19.16l-1.44 1.44M21 12h-2M5 12H3m16.16-6.16l-1.44-1.44M6.28 17.72l-1.44-1.44"/>
+                        <path d="M12 16a4 4 0 100-8 4 4 0 000 8z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-display text-xl font-bold text-[var(--text-primary)]">Agro-Intel Hub</h1>
+                    <p class="text-xs text-[var(--accent-primary)]">Your Digital Field Partner</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="status-badge status-online">
+                    <span class="indicator-dot bg-[var(--accent-primary)]"></span>
+                    Optimal
+                </div>
+                <button class="weather-btn" id="weatherToggle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--text-primary)]">
+                        <circle cx="12" cy="12" r="5"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                    </svg>
+                    <span class="hidden sm:inline">Weather</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Weather Panel -->
+    <div class="weather-panel" id="weatherPanel">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="font-display text-lg font-bold text-[var(--text-primary)]">Weather Forecast</h3>
+            <span class="text-sm text-[var(--accent-primary)]">Live</span>
+        </div>
+        
+        <div class="flex items-center gap-4 mb-6 p-4 rounded-xl" style="background: var(--bg-secondary);">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="text-3xl font-display font-bold text-[var(--text-primary)]">28°C</div>
+                <div class="text-sm text-text-secondary">Partly Cloudy</div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
+                <div class="text-2xl mb-1">💧</div>
+                <div class="text-lg font-bold text-[var(--text-primary)]">65%</div>
+                <div class="text-xs text-text-secondary">Humidity</div>
+            </div>
+            <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
+                <div class="text-2xl mb-1">🌧️</div>
+                <div class="text-lg font-bold text-[var(--text-primary)]">20%</div>
+                <div class="text-xs text-text-secondary">Rain</div>
+            </div>
+            <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
+                <div class="text-2xl mb-1">💨</div>
+                <div class="text-lg font-bold text-[var(--text-primary)]">12km/h</div>
+                <div class="text-xs text-text-secondary">Wind</div>
+            </div>
+        </div>
+        
+        <div class="text-sm text-text-secondary mb-3">5-Day Forecast</div>
+        <div class="flex justify-between">
+            <div class="text-center">
+                <div class="text-xs text-text-secondary">Mon</div>
+                <div class="my-1">⛅</div>
+                <div class="text-sm font-bold text-[var(--text-primary)]">27°</div>
+            </div>
+            <div class="text-center">
+                <div class="text-xs text-text-secondary">Tue</div>
+                <div class="my-1">🌧️</div>
+                <div class="text-sm font-bold text-[var(--text-primary)]">24°</div>
+            </div>
+            <div class="text-center">
+                <div class="text-xs text-text-secondary">Wed</div>
+                <div class="my-1">🌧️</div>
+                <div class="text-sm font-bold text-[var(--text-primary)]">22°</div>
+            </div>
+            <div class="text-center">
+                <div class="text-xs text-text-secondary">Thu</div>
+                <div class="my-1">⛅</div>
+                <div class="text-sm font-bold text-[var(--text-primary)]">26°</div>
+            </div>
+            <div class="text-center">
+                <div class="text-xs text-text-secondary">Fri</div>
+                <div class="my-1">☀️</div>
+                <div class="text-sm font-bold text-[var(--text-primary)]">29°</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="relative z-10 pt-24 pb-12 px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <h2 class="font-display text-4xl md:text-5xl font-black text-[var(--text-primary)] mb-4">
+                    Meet Your Smart Farm Companion
+                </h2>
+                <p class="text-lg text-text-secondary max-w-2xl mx-auto">
+                    Friendly, intelligent, and always ready to help you grow better crops.
+                </p>
+            </div>
+            
+            <!-- Main Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Left Side: Robot -->
+                <div>
+                    <!-- Robot Container -->
+                    <div class="p-0 overflow-hidden rounded-3xl" style="background: transparent;">
+                        <div id="robot-container">
+                            <iframe src='https://my.spline.design/nexbotrobotcharacterconcept-Q620C5zdED1vu7AtoC0Gw4Bo/' frameborder='0' width='100%' height='100%'></iframe>
+                            <!-- Cover Spline Branding -->
+                            <div style="position: absolute; bottom: 0; right: 0; width: 160px; height: 60px; background: var(--bg-primary); z-index: 50; pointer-events: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Chat Interface -->
+                <div class="chat-container h-[600px]">
+                    <div class="chat-header">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center shadow-lg shadow-[var(--shadow-color)]">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <path d="M12 8V12m0 4h.01M21.364 12A9.364 9.364 0 1112 2.636 9.364 9.364 0 0121.364 12z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-display font-bold text-[var(--text-primary)]">AI Field Advisor</h3>
+                                <p class="text-xs text-[var(--accent-primary)]">Ready for your questions.</p>
+                            </div>
+                            <select id="langSelect" class="lang-select">
+                                <option value="en-US">English</option>
+                                <option value="hi-IN">Hindi (हिंदी)</option>
+                                <option value="te-IN">Telugu (తెలుగు)</option>
+                                <option value="ta-IN">Tamil (தமிழ்)</option>
+                                <option value="kn-IN">Kannada (ಕನ್ನಡ)</option>
+                            </select>
+                            <select id="teluguStyle" class="dialect-select" style="display:none;">
+                                <option value="standard">Telugu: Standard (easy)</option>
+                                <option value="telangana">Telugu: Telangana slang</option>
+                                <option value="andhra">Telugu: Andhra slang</option>
+                                <option value="rayalaseema">Telugu: Rayalaseema slang</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-messages" id="chatMessages">
+                        <!-- Messages will be inserted here -->
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="px-5 py-3 flex gap-2 overflow-x-auto" style="background: var(--bg-card); border-top: 1px solid var(--border-color);">
+                        <button class="quick-action" onclick="quickQuestion('What crop should I grow?')">Crop suggestions</button>
+                        <button class="quick-action" onclick="quickQuestion('How is my soil health?')">Soil health</button>
+                        <button class="quick-action" onclick="quickQuestion('When will it rain?')">Rain forecast</button>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <form id="chatForm" class="flex gap-3">
+                            <button type="button" id="voiceBtn" class="voice-btn" title="Voice Input">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                    <line x1="12" y1="19" x2="12" y2="23"/>
+                                    <line x1="8" y1="23" x2="16" y2="23"/>
+                                </svg>
+                            </button>
+                            <button type="button" id="speakerBtn" class="voice-btn" title="Voice Output On">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                                </svg>
+                            </button>
+                            <input type="text" class="chat-input" id="chatInput" placeholder="Ask about crops, soil, weather..." autocomplete="off">
+                            <button type="submit" class="send-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Section: Dashboard & Features -->
+            <div class="space-y-6">
+                <!-- Soil Dashboard -->
+                <div class="soil-card">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-display text-lg font-bold text-[var(--text-primary)]">Live Field Conditions</h3>
+                        <span class="text-xs text-[var(--accent-primary)] flex items-center gap-2">
+                            <span class="indicator-dot bg-[var(--accent-primary)]" style="animation: none;"></span>
+                            Live Feed
+                        </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Soil Moisture -->
+                        <div class="flex items-center gap-3">
+                            <div id="moistureRadial" class="radial-progress" style="--value: 72; --accent-color: var(--accent-secondary);">
+                                <div class="radial-progress-content">
+                                    <div id="moistureValue" class="radial-progress-value">72%</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-semibold text-text-primary">Moisture</div>
+                                <div class="text-xs text-text-secondary">Optimal Level</div>
+                            </div>
+                        </div>
+                        <!-- Soil pH -->
+                        <div class="flex items-center gap-3">
+                            <div id="phRadial" class="radial-progress" style="--value: 68; --accent-color: var(--accent-primary);">
+                                <div class="radial-progress-content">
+                                    <div id="phValue" class="radial-progress-value">6.8</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-semibold text-text-primary">pH Level</div>
+                                <div class="text-xs text-text-secondary">Near Neutral</div>
+                            </div>
+                        </div>
+                        <!-- Soil Temperature -->
+                        <div class="flex items-center gap-3">
+                            <div id="tempRadial" class="radial-progress" style="--value: 60; --accent-color: #f39c12;">
+                                <div class="radial-progress-content">
+                                    <div id="tempValue" class="radial-progress-value">24°</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-semibold text-text-primary">Temperature</div>
+                                <div class="text-xs text-text-secondary">Ideal for Germination</div>
+                            </div>
+                        </div>
+                        <!-- Nitrogen Level -->
+                        <div class="flex items-center gap-3">
+                            <div id="nitrogenRadial" class="radial-progress" style="--value: 55; --accent-color: #e74c3c;">
+                                <div class="radial-progress-content">
+                                    <div id="nitrogenValue" class="radial-progress-value">Med</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-semibold text-text-primary">Nitrogen</div>
+                                <div class="text-xs text-text-secondary">Needs Improvement</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <div class="feature-card" onclick="askAbout('crops')">
+                        <div class="feature-icon text-[var(--accent-primary)]">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L12 22M12 2C12 2 8 6 8 10C8 14 12 18 12 18M12 2C12 2 16 6 16 10C16 14 12 18 12 18"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Crop Advisory</h4>
+                    </div>
+                    
+                    <div class="feature-card" onclick="askAbout('irrigation')">
+                        <div class="feature-icon text-[var(--accent-secondary)]">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v6M12 22v-6M2 12h6M22 12h-6"/>
+                                <circle cx="12" cy="12" r="4"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Irrigation</h4>
+                    </div>
+                    
+                    <div class="feature-card" onclick="askAbout('fertilizer')">
+                        <div class="feature-icon text-[#8e44ad]">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 21h10M12 21V11M12 11C12 11 8 7 8 4C8 4 12 4 12 4C12 4 16 4 16 4C16 7 12 11 12 11"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Fertilizer</h4>
+                    </div>
+                    
+                    <div class="feature-card" onclick="askAbout('pests')">
+                        <div class="feature-icon text-[#e74c3c]">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 9v2M12 15h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Pest Alerts</h4>
+                    </div>
+                    
+                    <div class="feature-card" onclick="askAbout('market')">
+                        <div class="feature-icon text-[#f39c12]">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18M9 17V9M13 17V5M17 17v-4"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Market Prices</h4>
+                    </div>
+                    
+                    <div class="feature-card" onclick="askAbout('health')">
+                        <div class="feature-icon text-[#16a085]">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Soil Health</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        // Chat functionality
+        const chatMessages = document.getElementById('chatMessages');
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const speakerBtn = document.getElementById('speakerBtn');
+        const langSelect = document.getElementById('langSelect');
+        const teluguStyle = document.getElementById('teluguStyle');
+        const ttsSupported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+        let ttsEnabled = true;
+        
+        // Backend API
+        const CHAT_API_URL = '/api/chat';
+        const SENSOR_API_URL = '/data';
+        
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'message-user' : 'message-bot'}`;
+            messageDiv.textContent = content;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            if (!isUser) {
+                speakText(content);
+            }
+        }
+
+        function setTtsState() {
+            if (!speakerBtn) return;
+            speakerBtn.classList.toggle('muted', !ttsEnabled);
+            speakerBtn.title = ttsEnabled ? 'Voice Output On' : 'Voice Output Off';
+        }
+
+        function getBestVoiceForLang(langCode) {
+            if (!ttsSupported) return null;
+            const voices = window.speechSynthesis.getVoices();
+            if (!voices || voices.length === 0) return null;
+
+            const exactVoice = voices.find(v => v.lang === langCode);
+            if (exactVoice) return exactVoice;
+
+            const baseLang = (langCode || 'en').split('-')[0];
+            return voices.find(v => v.lang && v.lang.startsWith(baseLang)) || null;
+        }
+
+        function speakText(text) {
+            if (!ttsSupported || !ttsEnabled) return;
+            const cleaned = (text || '').trim();
+            if (!cleaned) return;
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(cleaned);
+            utterance.lang = langSelect.value || 'en-US';
+            const voice = getBestVoiceForLang(utterance.lang);
+            if (voice) utterance.voice = voice;
+            utterance.rate = 1;
+            utterance.pitch = 1;
+
+            utterance.onstart = () => {
+                if (speakerBtn) speakerBtn.classList.add('speaking');
+            };
+            utterance.onend = () => {
+                if (speakerBtn) speakerBtn.classList.remove('speaking');
+            };
+            utterance.onerror = () => {
+                if (speakerBtn) speakerBtn.classList.remove('speaking');
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+        
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typing';
+            typingDiv.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function hideTyping() {
+            const typing = document.getElementById('typing');
+            if (typing) typing.remove();
+        }
+
+        function updateTeluguStyleVisibility() {
+            if (!teluguStyle) return;
+            teluguStyle.style.display = (langSelect.value === 'te-IN') ? 'inline-block' : 'none';
+        }
+
+        function getTeluguStyleInstruction() {
+            if (!teluguStyle || langSelect.value !== 'te-IN') return '';
+            if (teluguStyle.value === 'telangana') {
+                return 'Use Telangana Telugu slang naturally, but keep wording easy to understand.';
+            }
+            if (teluguStyle.value === 'andhra') {
+                return 'Use Andhra Telugu slang naturally, but keep wording easy to understand.';
+            }
+            if (teluguStyle.value === 'rayalaseema') {
+                return 'Use Rayalaseema Telugu slang naturally, but keep wording easy to understand.';
+            }
+            return 'Use clear, simple standard Telugu. Avoid heavy regional slang and difficult words.';
+        }
+        
+        async function handleQuestion(question) {
+            addMessage(question, true);
+            showTyping();
+
+            const langName = langSelect.options[langSelect.selectedIndex].text;
+            const teluguStyleInstruction = getTeluguStyleInstruction();
+
+            try {
+                const response = await fetch(CHAT_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        question,
+                        langName,
+                        teluguStyle: teluguStyle ? teluguStyle.value : 'standard',
+                        teluguStyleInstruction
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    const message = data && data.error ? data.error : 'Server error';
+                    throw new Error(message);
+                }
+
+                hideTyping();
+                if (data.reply) {
+                    addMessage(data.reply);
+                } else {
+                    addMessage('I received an empty response. Please try again.');
+                }
+            } catch (error) {
+                hideTyping();
+                console.error('Fetch Error:', error);
+                addMessage(`I'm having trouble reaching the server: ${error.message}`);
+            }
+        }
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const question = chatInput.value.trim();
+            if (question) {
+                handleQuestion(question);
+                chatInput.value = '';
+            }
+        });
+        
+        function quickQuestion(q) {
+            handleQuestion(q);
+        }
+        
+        function askAbout(topic) {
+            const questions = {
+                crops: "What crops should I grow this season?",
+                irrigation: "What are the irrigation recommendations?",
+                fertilizer: "What fertilizer should I use?",
+                pests: "Are there any pest alerts?",
+                market: "What are the current market prices?",
+                health: "How is my soil health?"
+            };
+            handleQuestion(questions[topic]);
+        }
+        
+        // Voice Recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            
+            voiceBtn.addEventListener('click', () => {
+                if (voiceBtn.classList.contains('listening')) {
+                    recognition.stop();
+                } else {
+                    recognition.lang = langSelect.value;
+                    recognition.start();
+                }
+            });
+            
+            recognition.onstart = () => {
+                voiceBtn.classList.add('listening');
+            };
+            
+            recognition.onend = () => {
+                voiceBtn.classList.remove('listening');
+            };
+            
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value = transcript;
+                handleQuestion(transcript);
+                chatInput.value = '';
+            };
+        } else {
+            voiceBtn.style.display = 'none';
+            console.log("Speech recognition not supported");
+        }
+
+        if (ttsSupported) {
+            setTtsState();
+            if (speakerBtn) {
+                speakerBtn.addEventListener('click', () => {
+                    ttsEnabled = !ttsEnabled;
+                    if (!ttsEnabled) {
+                        window.speechSynthesis.cancel();
+                        speakerBtn.classList.remove('speaking');
+                    }
+                    setTtsState();
+                });
+            }
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.getVoices();
+            };
+        } else if (speakerBtn) {
+            speakerBtn.style.display = 'none';
+        }
+
+        langSelect.addEventListener('change', updateTeluguStyleVisibility);
+        updateTeluguStyleVisibility();
+        
+        // Initial greeting
+        setTimeout(() => {
+            addMessage("Hello! I'm AgroBot. I can help you with crop recommendations, soil analysis, and more. Select your language above!");
+        }, 1000);
+        
+        // Weather toggle
+        const weatherToggle = document.getElementById('weatherToggle');
+        const weatherPanel = document.getElementById('weatherPanel');
+        
+        weatherToggle.addEventListener('click', () => {
+            weatherPanel.classList.toggle('active');
+        });
+        
+        // Close weather panel when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!weatherPanel.contains(e.target) && !weatherToggle.contains(e.target)) {
+                weatherPanel.classList.remove('active');
+            }
+        });
+        
+        // Live soil data (sensor-backed with simulation fallback)
+        function updateSoilDataSimulated() {
+            const moisture = 68 + Math.random() * 8;
+            const ph = 6.5 + Math.random() * 0.5;
+            const temp = 22 + Math.random() * 4;
+            const nitrogen = 50 + Math.random() * 10;
+            applySoilData({ moisture, ph, temp, nitrogen });
+        }
+
+        function applySoilData(data) {
+            const moisture = Number(data.moisture ?? 70);
+            const ph = Number(data.ph ?? 6.8);
+            const temp = Number(data.temp ?? 24);
+            const nitrogen = Number(data.nitrogen ?? 55);
+
+            document.getElementById('moistureValue').textContent = moisture.toFixed(0) + '%';
+            document.getElementById('moistureRadial').style.setProperty('--value', moisture.toFixed(0));
+
+            document.getElementById('phValue').textContent = ph.toFixed(1);
+            document.getElementById('phRadial').style.setProperty('--value', (ph / 14 * 100).toFixed(0));
+
+            document.getElementById('tempValue').textContent = temp.toFixed(0) + '�';
+            document.getElementById('tempRadial').style.setProperty('--value', (temp / 40 * 100).toFixed(0));
+
+            document.getElementById('nitrogenValue').textContent = nitrogen > 60 ? 'High' : nitrogen > 45 ? 'Med' : 'Low';
+            document.getElementById('nitrogenRadial').style.setProperty('--value', nitrogen.toFixed(0));
+        }
+
+        async function updateSoilData() {
+            try {
+                const response = await fetch(SENSOR_API_URL);
+                if (!response.ok) throw new Error('No sensor feed');
+                const payload = await response.json();
+                applySoilData(payload || {});
+            } catch (error) {
+                updateSoilDataSimulated();
+            }
+        }
+
+        updateSoilData();
+        setInterval(updateSoilData, 5000);
+        // Floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = Math.random() * 100 + 'vh';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.opacity = 0.1 + Math.random() * 0.3;
+                container.appendChild(particle);
+                
+                // Animate particles
+                animateParticle(particle);
+            }
+        }
+        
+        function animateParticle(particle) {
+            const duration = 10000 + Math.random() * 20000;
+            const startX = parseFloat(particle.style.left);
+            const startY = parseFloat(particle.style.top);
+            
+            particle.animate([
+                { transform: 'translate(0, 0)', opacity: particle.style.opacity },
+                { transform: `translate(${Math.random() * 200 - 100}px, ${-200 - Math.random() * 200}px)`, opacity: 0 }
+            ], {
+                duration: duration,
+                easing: 'linear'
+            }).onfinish = () => {
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = (100 + Math.random() * 20) + 'vh';
+                particle.style.opacity = 0.1 + Math.random() * 0.3;
+                animateParticle(particle);
+            };
+        }
+        
+        createParticles();
+        
+        // Scroll reveal animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.soil-card, .feature-card, .chat-container').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
