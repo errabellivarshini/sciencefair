@@ -300,6 +300,228 @@
             border-color: var(--accent-primary);
             color: var(--accent-primary);
         }
+
+        /* Irrigation dashboard */
+        .irrigation-card {
+            background:
+                radial-gradient(120% 120% at 0% 0%, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0) 50%),
+                radial-gradient(120% 120% at 100% 100%, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0) 50%),
+                var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            color: var(--text-primary);
+            box-shadow: 0 10px 26px var(--shadow-color);
+        }
+        .irrigation-heading {
+            font-family: 'Orbitron', monospace;
+            color: var(--text-primary);
+            font-size: 1.55rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        .irrigation-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+        .irrigation-badge {
+            border: 1px solid #10b981;
+            color: #10b981;
+            border-radius: 999px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+        }
+        .status-row {
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px 16px;
+            background: #ffffffcc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-label {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 66px;
+            height: 36px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            background: #cbd5e1;
+            transition: background 0.2s ease;
+        }
+        .toggle-switch.active {
+            background: #10b981;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            background: #ffffff;
+            transition: transform 0.2s ease;
+        }
+        .toggle-switch.active::after {
+            transform: translateX(30px);
+        }
+        .ui-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-color: #ffffff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            padding: 10px 38px 10px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.2;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+        .ui-select:hover {
+            border-color: #93c5fd;
+            background-color: #f8fafc;
+        }
+        .ui-select:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+        .ui-select option {
+            color: var(--text-primary);
+            background: #ffffff;
+            font-weight: 500;
+        }
+        .irrigation-select {
+            width: 100%;
+        }
+        .irrigation-label {
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .irrigation-metric {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            background: #ffffffd9;
+        }
+        .irrigation-metric-title {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .irrigation-metric-value {
+            margin-top: 4px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #34d399;
+        }
+        .valve-panel {
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+        }
+        .power-btn {
+            width: 94px;
+            height: 94px;
+            border-radius: 999px;
+            border: 2px solid #cbd5e1;
+            background: #ffffff;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .power-btn.active {
+            border-color: #10b981;
+            color: #10b981;
+            box-shadow: 0 0 18px rgba(16, 185, 129, 0.35);
+        }
+        .power-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+            box-shadow: none;
+        }
+        .sensor-status {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+        .sensor-status.on {
+            color: #10b981;
+        }
+        .sensor-status.off {
+            color: #ef4444;
+        }
+        .valve-title {
+            letter-spacing: 0.2em;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .valve-state {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .mode-btn {
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            background: #ffffff;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .mode-btn.active {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: #dcfce7;
+        }
+        .irrigation-action-btn {
+            border: 1px solid #10b981;
+            border-radius: 10px;
+            background: #10b981;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .irrigation-action-btn:hover {
+            background: #059669;
+            border-color: #059669;
+        }
         
         /* Voice & Language Controls */
         .voice-btn {
@@ -337,25 +559,11 @@
         }
         
         .lang-select {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-size: 12px;
-            color: var(--text-primary);
-            outline: none;
-            cursor: pointer;
+            min-width: 146px;
             margin-left: auto;
         }
         .dialect-select {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-size: 12px;
-            color: var(--text-primary);
-            outline: none;
-            cursor: pointer;
+            min-width: 172px;
         }
         
         /* Feature cards */
@@ -542,6 +750,15 @@
                     <span class="indicator-dot bg-[var(--accent-primary)]"></span>
                     Optimal
                 </div>
+                <button class="weather-btn" id="dashboardToggle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--text-primary)]">
+                        <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                    </svg>
+                    <span class="hidden sm:inline">Dashboard</span>
+                </button>
                 <button class="weather-btn" id="weatherToggle">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--text-primary)]">
                         <circle cx="12" cy="12" r="5"/>
@@ -553,14 +770,14 @@
         </div>
     </header>
     
-    <!-- Weather Panel -->
+        <!-- Weather Panel -->
     <div class="weather-panel" id="weatherPanel">
         <div class="flex items-center justify-between mb-6">
             <h3 class="font-display text-lg font-bold text-[var(--text-primary)]">Weather Forecast</h3>
-            <span class="text-sm text-[var(--accent-primary)]">Live</span>
+            <span class="text-sm text-[var(--accent-primary)]" id="weatherUpdated">Loading...</span>
         </div>
-        
-        <div class="flex items-center gap-4 mb-6 p-4 rounded-xl" style="background: var(--bg-secondary);">
+
+        <div class="flex items-center gap-4 mb-3 p-4 rounded-xl" style="background: var(--bg-secondary);">
             <div class="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                     <circle cx="12" cy="12" r="5"/>
@@ -568,59 +785,60 @@
                 </svg>
             </div>
             <div>
-                <div class="text-3xl font-display font-bold text-[var(--text-primary)]">28°C</div>
-                <div class="text-sm text-text-secondary">Partly Cloudy</div>
+                <div class="text-3xl font-display font-bold text-[var(--text-primary)]" id="weatherTemp">--C</div>
+                <div class="text-sm text-text-secondary" id="weatherCondition">Fetching weather...</div>
+                <div class="text-xs text-text-secondary mt-1" id="weatherLocation">Detecting your location...</div>
             </div>
         </div>
-        
+
         <div class="grid grid-cols-3 gap-3 mb-6">
             <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
-                <div class="text-2xl mb-1">💧</div>
-                <div class="text-lg font-bold text-[var(--text-primary)]">65%</div>
+                <div class="text-2xl mb-1">H</div>
+                <div class="text-lg font-bold text-[var(--text-primary)]" id="weatherHumidity">--%</div>
                 <div class="text-xs text-text-secondary">Humidity</div>
             </div>
             <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
-                <div class="text-2xl mb-1">🌧️</div>
-                <div class="text-lg font-bold text-[var(--text-primary)]">20%</div>
-                <div class="text-xs text-text-secondary">Rain</div>
+                <div class="text-2xl mb-1">R</div>
+                <div class="text-lg font-bold text-[var(--text-primary)]" id="weatherRain">--%</div>
+                <div class="text-xs text-text-secondary">Rain chance</div>
             </div>
             <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
-                <div class="text-2xl mb-1">💨</div>
-                <div class="text-lg font-bold text-[var(--text-primary)]">12km/h</div>
+                <div class="text-2xl mb-1">W</div>
+                <div class="text-lg font-bold text-[var(--text-primary)]" id="weatherWind">-- km/h</div>
                 <div class="text-xs text-text-secondary">Wind</div>
             </div>
         </div>
-        
+
         <div class="text-sm text-text-secondary mb-3">5-Day Forecast</div>
-        <div class="flex justify-between">
+        <div class="flex justify-between" id="weatherDaily">
             <div class="text-center">
-                <div class="text-xs text-text-secondary">Mon</div>
-                <div class="my-1">⛅</div>
-                <div class="text-sm font-bold text-[var(--text-primary)]">27°</div>
+                <div class="text-xs text-text-secondary">-</div>
+                <div class="my-1">-</div>
+                <div class="text-sm font-bold text-[var(--text-primary)]">-</div>
             </div>
             <div class="text-center">
-                <div class="text-xs text-text-secondary">Tue</div>
-                <div class="my-1">🌧️</div>
-                <div class="text-sm font-bold text-[var(--text-primary)]">24°</div>
+                <div class="text-xs text-text-secondary">-</div>
+                <div class="my-1">-</div>
+                <div class="text-sm font-bold text-[var(--text-primary)]">-</div>
             </div>
             <div class="text-center">
-                <div class="text-xs text-text-secondary">Wed</div>
-                <div class="my-1">🌧️</div>
-                <div class="text-sm font-bold text-[var(--text-primary)]">22°</div>
+                <div class="text-xs text-text-secondary">-</div>
+                <div class="my-1">-</div>
+                <div class="text-sm font-bold text-[var(--text-primary)]">-</div>
             </div>
             <div class="text-center">
-                <div class="text-xs text-text-secondary">Thu</div>
-                <div class="my-1">⛅</div>
-                <div class="text-sm font-bold text-[var(--text-primary)]">26°</div>
+                <div class="text-xs text-text-secondary">-</div>
+                <div class="my-1">-</div>
+                <div class="text-sm font-bold text-[var(--text-primary)]">-</div>
             </div>
             <div class="text-center">
-                <div class="text-xs text-text-secondary">Fri</div>
-                <div class="my-1">☀️</div>
-                <div class="text-sm font-bold text-[var(--text-primary)]">29°</div>
+                <div class="text-xs text-text-secondary">-</div>
+                <div class="my-1">-</div>
+                <div class="text-sm font-bold text-[var(--text-primary)]">-</div>
             </div>
         </div>
     </div>
-    
+
     <!-- Main Content -->
     <main class="relative z-10 pt-24 pb-12 px-6">
         <div class="max-w-7xl mx-auto">
@@ -661,14 +879,14 @@
                                 <h3 class="font-display font-bold text-[var(--text-primary)]">AI Field Advisor</h3>
                                 <p class="text-xs text-[var(--accent-primary)]">Ready for your questions.</p>
                             </div>
-                            <select id="langSelect" class="lang-select">
+                            <select id="langSelect" class="lang-select ui-select">
                                 <option value="en-US">English</option>
                                 <option value="hi-IN">Hindi (हिंदी)</option>
                                 <option value="te-IN">Telugu (తెలుగు)</option>
                                 <option value="ta-IN">Tamil (தமிழ்)</option>
                                 <option value="kn-IN">Kannada (ಕನ್ನಡ)</option>
                             </select>
-                            <select id="teluguStyle" class="dialect-select" style="display:none;">
+                            <select id="teluguStyle" class="dialect-select ui-select" style="display:none;">
                                 <option value="standard">Telugu: Standard (easy)</option>
                                 <option value="telangana">Telugu: Telangana slang</option>
                                 <option value="andhra">Telugu: Andhra slang</option>
@@ -719,7 +937,7 @@
             <!-- Bottom Section: Dashboard & Features -->
             <div class="space-y-6">
                 <!-- Soil Dashboard -->
-                <div class="soil-card">
+                <div class="soil-card" id="dashboardSection">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="font-display text-lg font-bold text-[var(--text-primary)]">Live Field Conditions</h3>
                         <span class="text-xs text-[var(--accent-primary)] flex items-center gap-2">
@@ -757,7 +975,7 @@
                         <div class="flex items-center gap-3">
                             <div id="tempRadial" class="radial-progress" style="--value: 60; --accent-color: #f39c12;">
                                 <div class="radial-progress-content">
-                                    <div id="tempValue" class="radial-progress-value">24°</div>
+                                    <div id="tempValue" class="radial-progress-value">24C</div>
                                 </div>
                             </div>
                             <div>
@@ -776,6 +994,60 @@
                                 <div class="text-sm font-semibold text-text-primary">Nitrogen</div>
                                 <div class="text-xs text-text-secondary">Needs Improvement</div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="irrigation-card" id="irrigationControl">
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="flex items-center gap-3">
+                            <div><h3 class="irrigation-heading">Irrigation Control</h3><div class="irrigation-subtitle">Smart valve automation with soil-based calibration</div></div>
+                            <span class="irrigation-badge" id="modeBadge">AUTO MODE</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="autoModeBtn" class="mode-btn active" type="button">Auto</button>
+                            <button id="manualModeBtn" class="mode-btn" type="button">Manual</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div class="status-row">
+                                <div class="status-label">System Status</div>
+                                <div class="flex items-center gap-2">
+                                    <button id="irrigationStartBtn" class="irrigation-action-btn" type="button">Start</button>
+                                    <button id="systemStatusToggle" class="toggle-switch active" type="button" aria-label="Toggle irrigation system"></button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="irrigation-label">SOIL CALIBRATION</div>
+                                <select id="soilCalibrationSelect" class="irrigation-select ui-select">
+                                    <option value="sandy">Sandy Soil</option>
+                                    <option value="loamy">Loamy Soil</option>
+                                    <option value="clay">Clay Soil</option>
+                                    <option value="silty">Silty Soil</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="irrigation-metric">
+                                    <div class="irrigation-metric-title">Moisture Range</div>
+                                    <div id="soilMoistureRange" class="irrigation-metric-value">10% - 25%</div>
+                                </div>
+                                <div class="irrigation-metric">
+                                    <div class="irrigation-metric-title">Drainage</div>
+                                    <div id="soilDrainage" class="irrigation-metric-value" style="color:#38bdf8;">Fast</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="valve-panel">
+                            <button id="mainValvePower" class="power-btn" type="button" aria-label="Toggle main valve"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v8"></path><path d="M7.5 4.8a8 8 0 1 0 9 0"></path></svg></button>
+                            <div class="valve-title">MAIN VALVE</div>
+                            <div id="sensorStatusText" class="sensor-status off">SENSOR OFF</div>
+                            <div id="mainValveState" class="valve-state">CLOSED</div>
+                            <div id="mainValveReason" class="text-xs text-text-secondary">Auto mode will manage based on moisture.</div>
                         </div>
                     </div>
                 </div>
@@ -854,8 +1126,12 @@
         let ttsEnabled = true;
         
         // Backend API
-        const CHAT_API_URL = '/api/chat';
-        const SENSOR_API_URL = '/data';
+        const API_BASE_URL = (
+            window.localStorage.getItem('AGROBOT_API_BASE_URL') ||
+            (window.location.port === '5500' ? 'http://127.0.0.1:5000' : window.location.origin)
+        ).replace(/\/$/, '');
+        const CHAT_API_URL = API_BASE_URL + '/api/chat';
+        const SENSOR_API_URL = API_BASE_URL + '/data';
         
         function addMessage(content, isUser = false) {
             const messageDiv = document.createElement('div');
@@ -946,6 +1222,16 @@
             return 'Use clear, simple standard Telugu. Avoid heavy regional slang and difficult words.';
         }
         
+        async function parseJsonSafe(response) {
+            const raw = await response.text();
+            if (!raw) return {};
+            try {
+                return JSON.parse(raw);
+            } catch {
+                return { raw };
+            }
+        }
+
         async function handleQuestion(question) {
             addMessage(question, true);
             showTyping();
@@ -967,9 +1253,10 @@
                     })
                 });
 
-                const data = await response.json();
+                const data = await parseJsonSafe(response);
                 if (!response.ok) {
-                    const message = data && data.error ? data.error : 'Server error';
+                    const fallback = typeof data?.raw === 'string' ? data.raw.slice(0, 180) : '';
+                    const message = data && data.error ? data.error : (fallback || `Server error (${response.status})`);
                     throw new Error(message);
                 }
 
@@ -1072,11 +1359,254 @@
         }, 1000);
         
         // Weather toggle
+        const dashboardToggle = document.getElementById('dashboardToggle');
         const weatherToggle = document.getElementById('weatherToggle');
         const weatherPanel = document.getElementById('weatherPanel');
+        const dashboardSection = document.getElementById('dashboardSection');
+        const weatherTemp = document.getElementById('weatherTemp');
+        const weatherCondition = document.getElementById('weatherCondition');
+        const weatherLocation = document.getElementById('weatherLocation');
+        const weatherHumidity = document.getElementById('weatherHumidity');
+        const weatherRain = document.getElementById('weatherRain');
+        const weatherWind = document.getElementById('weatherWind');
+        const weatherDaily = document.getElementById('weatherDaily');
+        const weatherUpdated = document.getElementById('weatherUpdated');
+        const autoModeBtn = document.getElementById('autoModeBtn');
+        const manualModeBtn = document.getElementById('manualModeBtn');
+        const modeBadge = document.getElementById('modeBadge');
+        const systemStatusToggle = document.getElementById('systemStatusToggle');
+        const soilCalibrationSelect = document.getElementById('soilCalibrationSelect');
+        const soilMoistureRange = document.getElementById('soilMoistureRange');
+        const soilDrainage = document.getElementById('soilDrainage');
+        const irrigationStartBtn = document.getElementById('irrigationStartBtn');
+        const mainValvePower = document.getElementById('mainValvePower');
+        const sensorStatusText = document.getElementById('sensorStatusText');
+        const mainValveState = document.getElementById('mainValveState');
+        const mainValveReason = document.getElementById('mainValveReason');
+        const irrigationControl = document.getElementById('irrigationControl');
+        let liveMoisture = 72;
+        let sensorOnline = false;
+        const soilProfiles = {
+            sandy: { min: 10, max: 25, drainage: "Fast" },
+            loamy: { min: 20, max: 35, drainage: "Balanced" },
+            clay: { min: 30, max: 45, drainage: "Slow" },
+            silty: { min: 18, max: 32, drainage: "Moderate" },
+        };
+        const irrigationState = {
+            systemOn: true,
+            autoMode: true,
+            valveOpen: false,
+        };
+        const weatherCodeMap = {
+            0: "Clear",
+            1: "Mostly clear",
+            2: "Partly cloudy",
+            3: "Cloudy",
+            45: "Fog",
+            48: "Rime fog",
+            51: "Light drizzle",
+            53: "Drizzle",
+            55: "Dense drizzle",
+            61: "Light rain",
+            63: "Rain",
+            65: "Heavy rain",
+            71: "Light snow",
+            73: "Snow",
+            75: "Heavy snow",
+            80: "Rain showers",
+            81: "Rain showers",
+            82: "Heavy showers",
+            95: "Thunderstorm",
+        };
+
+        function weatherLabel(code) {
+            return weatherCodeMap[Number(code)] || "Weather update";
+        }
+
+        function updateIrrigationUI() {
+            const profile = soilProfiles[soilCalibrationSelect.value] || soilProfiles.sandy;
+            soilMoistureRange.textContent = `${profile.min}% - ${profile.max}%`;
+            soilDrainage.textContent = profile.drainage;
+
+            if (!sensorOnline) {
+                irrigationState.valveOpen = false;
+            } else if (!irrigationState.systemOn) {
+                irrigationState.valveOpen = false;
+            } else if (irrigationState.autoMode) {
+                irrigationState.valveOpen = Number(liveMoisture) < Number(profile.min);
+            }
+
+            systemStatusToggle.classList.toggle('active', irrigationState.systemOn);
+            autoModeBtn.classList.toggle('active', irrigationState.autoMode);
+            manualModeBtn.classList.toggle('active', !irrigationState.autoMode);
+            modeBadge.textContent = irrigationState.autoMode ? 'AUTO MODE' : 'MANUAL MODE';
+            modeBadge.style.borderColor = irrigationState.autoMode ? '#10b981' : '#f59e0b';
+            modeBadge.style.color = irrigationState.autoMode ? '#10b981' : '#f59e0b';
+
+            mainValvePower.classList.toggle('active', sensorOnline);
+            mainValvePower.disabled = !sensorOnline;
+            sensorStatusText.textContent = sensorOnline ? 'SENSOR ON' : 'SENSOR OFF';
+            sensorStatusText.classList.toggle('on', sensorOnline);
+            sensorStatusText.classList.toggle('off', !sensorOnline);
+            mainValveState.textContent = irrigationState.valveOpen ? 'OPEN' : 'CLOSED';
+
+            if (!sensorOnline) {
+                mainValveReason.textContent = 'Sensor feed unavailable. Waiting for live sensor data.';
+            } else if (!irrigationState.systemOn) {
+                mainValveReason.textContent = 'System is OFF. Main valve forced CLOSED.';
+            } else if (irrigationState.autoMode) {
+                mainValveReason.textContent = irrigationState.valveOpen
+                    ? `Auto mode opened valve: moisture ${Math.round(liveMoisture)}% is below ${profile.min}%.`
+                    : `Auto mode kept valve closed: moisture ${Math.round(liveMoisture)}% is within target.`;
+            } else {
+                mainValveReason.textContent = 'Manual mode active. Power button controls main valve.';
+            }
+        }
+
+        function dayLabel(isoDate) {
+            const date = new Date(`${isoDate}T00:00:00`);
+            return date.toLocaleDateString(undefined, { weekday: "short" });
+        }
+
+        function weatherIcon(label) {
+            const text = String(label).toLowerCase();
+            if (text.includes("rain") || text.includes("drizzle") || text.includes("showers")) return "Rain";
+            if (text.includes("thunder")) return "Storm";
+            if (text.includes("snow")) return "Snow";
+            if (text.includes("cloud")) return "Cloud";
+            if (text.includes("fog")) return "Fog";
+            return "Sun";
+        }
+
+        async function reverseGeocode(lat, lon) {
+            try {
+                const res = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=en&count=1`);
+                if (!res.ok) return `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+                const data = await res.json();
+                const place = (data?.results || [])[0];
+                if (!place) return `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+                const name = place.name || "";
+                const admin = place.admin1 || "";
+                const country = place.country || "";
+                return [name, admin, country].filter(Boolean).join(", ");
+            } catch {
+                return `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+            }
+        }
+
+        function getCurrentPosition() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error("Geolocation not supported in this browser."));
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => resolve(pos),
+                    (err) => reject(err),
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 120000 }
+                );
+            });
+        }
+
+        async function fetchPreciseWeather() {
+            weatherUpdated.textContent = "Updating...";
+            try {
+                const position = await getCurrentPosition();
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                const weatherRes = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,precipitation_probability_max&timezone=auto&forecast_days=5`
+                );
+                if (!weatherRes.ok) throw new Error(`Weather API ${weatherRes.status}`);
+                const weather = await weatherRes.json();
+
+                const current = weather.current || {};
+                const daily = weather.daily || {};
+                const code = Number(current.weather_code ?? 0);
+                const label = weatherLabel(code);
+
+                weatherTemp.textContent = `${Math.round(Number(current.temperature_2m ?? 0))}C`;
+                weatherCondition.textContent = label;
+                weatherHumidity.textContent = `${Math.round(Number(current.relative_humidity_2m ?? 0))}%`;
+                weatherWind.textContent = `${Math.round(Number(current.wind_speed_10m ?? 0))} km/h`;
+                const rainNow = Array.isArray(daily.precipitation_probability_max) ? Number(daily.precipitation_probability_max[0] ?? 0) : 0;
+                weatherRain.textContent = `${Math.round(rainNow)}%`;
+                weatherLocation.textContent = await reverseGeocode(lat, lon);
+                weatherUpdated.textContent = "Live";
+
+                const times = daily.time || [];
+                const codes = daily.weather_code || [];
+                const maxTemps = daily.temperature_2m_max || [];
+                weatherDaily.innerHTML = times.slice(0, 5).map((day, i) => {
+                    const dayCode = Number(codes[i] ?? 0);
+                    const dayLabelText = dayLabel(day);
+                    const dayCondition = weatherLabel(dayCode);
+                    const icon = weatherIcon(dayCondition);
+                    const temp = `${Math.round(Number(maxTemps[i] ?? 0))}C`;
+                    return `
+                        <div class="text-center">
+                            <div class="text-xs text-text-secondary">${dayLabelText}</div>
+                            <div class="my-1">${icon}</div>
+                            <div class="text-sm font-bold text-[var(--text-primary)]">${temp}</div>
+                        </div>
+                    `;
+                }).join("");
+            } catch (error) {
+                weatherUpdated.textContent = "Unavailable";
+                weatherCondition.textContent = "Location permission needed";
+                weatherLocation.textContent = "Enable location for precise forecast";
+                console.error("Weather Error:", error);
+            }
+        }
         
+        dashboardToggle.addEventListener('click', () => {
+            if (weatherPanel.classList.contains('active')) {
+                weatherPanel.classList.remove('active');
+            }
+            irrigationControl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        autoModeBtn.addEventListener('click', () => {
+            irrigationState.autoMode = true;
+            updateIrrigationUI();
+        });
+        manualModeBtn.addEventListener('click', () => {
+            irrigationState.autoMode = false;
+            updateIrrigationUI();
+        });
+        systemStatusToggle.addEventListener('click', () => {
+            irrigationState.systemOn = !irrigationState.systemOn;
+            updateIrrigationUI();
+        });
+        irrigationStartBtn.addEventListener('click', () => {
+            if (!sensorOnline) {
+                updateIrrigationUI();
+                return;
+            }
+            irrigationState.systemOn = true;
+            if (irrigationState.autoMode) {
+                const profile = soilProfiles[soilCalibrationSelect.value] || soilProfiles.sandy;
+                irrigationState.valveOpen = Number(liveMoisture) < Number(profile.min);
+            } else {
+                irrigationState.valveOpen = true;
+            }
+            updateIrrigationUI();
+        });
+        soilCalibrationSelect.addEventListener('change', updateIrrigationUI);
+        mainValvePower.addEventListener('click', () => {
+            if (!sensorOnline) return;
+            if (!irrigationState.systemOn) return;
+            if (irrigationState.autoMode) return;
+            irrigationState.valveOpen = !irrigationState.valveOpen;
+            updateIrrigationUI();
+        });
+
         weatherToggle.addEventListener('click', () => {
             weatherPanel.classList.toggle('active');
+            if (weatherPanel.classList.contains('active')) {
+                fetchPreciseWeather();
+            }
         });
         
         // Close weather panel when clicking outside
@@ -1085,6 +1615,9 @@
                 weatherPanel.classList.remove('active');
             }
         });
+
+        fetchPreciseWeather();
+        setInterval(fetchPreciseWeather, 15 * 60 * 1000);
         
         // Live soil data (sensor-backed with simulation fallback)
         function updateSoilDataSimulated() {
@@ -1092,14 +1625,16 @@
             const ph = 6.5 + Math.random() * 0.5;
             const temp = 22 + Math.random() * 4;
             const nitrogen = 50 + Math.random() * 10;
-            applySoilData({ moisture, ph, temp, nitrogen });
+            applySoilData({ moisture, ph, temp, nitrogen }, false);
         }
 
-        function applySoilData(data) {
+        function applySoilData(data, fromSensor = true) {
             const moisture = Number(data.moisture ?? 70);
             const ph = Number(data.ph ?? 6.8);
             const temp = Number(data.temp ?? 24);
             const nitrogen = Number(data.nitrogen ?? 55);
+            liveMoisture = moisture;
+            sensorOnline = fromSensor;
 
             document.getElementById('moistureValue').textContent = moisture.toFixed(0) + '%';
             document.getElementById('moistureRadial').style.setProperty('--value', moisture.toFixed(0));
@@ -1107,20 +1642,22 @@
             document.getElementById('phValue').textContent = ph.toFixed(1);
             document.getElementById('phRadial').style.setProperty('--value', (ph / 14 * 100).toFixed(0));
 
-            document.getElementById('tempValue').textContent = temp.toFixed(0) + '�';
+            document.getElementById('tempValue').textContent = temp.toFixed(0) + 'C';
             document.getElementById('tempRadial').style.setProperty('--value', (temp / 40 * 100).toFixed(0));
 
             document.getElementById('nitrogenValue').textContent = nitrogen > 60 ? 'High' : nitrogen > 45 ? 'Med' : 'Low';
             document.getElementById('nitrogenRadial').style.setProperty('--value', nitrogen.toFixed(0));
+            updateIrrigationUI();
         }
 
         async function updateSoilData() {
             try {
                 const response = await fetch(SENSOR_API_URL);
                 if (!response.ok) throw new Error('No sensor feed');
-                const payload = await response.json();
+                const payload = await parseJsonSafe(response);
                 applySoilData(payload || {});
             } catch (error) {
+                sensorOnline = false;
                 updateSoilDataSimulated();
             }
         }

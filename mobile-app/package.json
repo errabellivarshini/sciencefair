@@ -1,0 +1,22 @@
+﻿{
+  "name": "agrobot-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@react-native-voice/voice": "^3.2.4",
+    "expo": "~53.0.0",
+    "expo-device": "~7.0.3",
+    "expo-notifications": "~0.31.4",
+    "expo-speech": "~13.0.1",
+    "expo-status-bar": "~2.2.3",
+    "react": "19.0.0",
+    "react-native": "0.79.5"
+  }
+}

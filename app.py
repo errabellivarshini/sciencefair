@@ -4,13 +4,14 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory
+from flask_cors import CORS
 
 
+BASE_DIR = Path(__file__).resolve().parent
 load_dotenv()
 
 app = Flask(__name__)
-
-BASE_DIR = Path(__file__).resolve().parent
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # In-memory latest sensor values (simple start; replace with DB later if needed)
 sensor_data = {

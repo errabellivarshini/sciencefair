@@ -1,0 +1,33 @@
+﻿{
+  "expo": {
+    "name": "AgroBot",
+    "slug": "agrobot-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "AgroBot uses the microphone to capture your farming questions."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#f3f9f4"
+      },
+      "permissions": [
+        "RECORD_AUDIO",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+    "plugins": [
+      "expo-notifications"
+    ],
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
