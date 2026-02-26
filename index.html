@@ -184,6 +184,7 @@
             padding: 14px 18px;
             border-radius: 20px;
             animation: messageIn 0.4s ease;
+            white-space: pre-line;
         }
         
         @keyframes messageIn {
@@ -303,6 +304,63 @@
 
         .mobile-command-btn {
             display: none;
+        }
+
+        .hero-brand-mobile {
+            display: none;
+        }
+
+        .assistant-mic {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            color: #10b981;
+        }
+
+        .assistant-mic .mic-stem {
+            position: absolute;
+            left: 50%;
+            top: 1px;
+            width: 8px;
+            height: 14px;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: currentColor;
+        }
+
+        .assistant-mic .mic-arc {
+            position: absolute;
+            top: 11px;
+            width: 11px;
+            height: 9px;
+            border-bottom-width: 4px;
+            border-bottom-style: solid;
+        }
+
+        .assistant-mic .mic-arc-left {
+            left: 2px;
+            border-left: 4px solid currentColor;
+            border-bottom-color: currentColor;
+            border-bottom-left-radius: 12px;
+        }
+
+        .assistant-mic .mic-arc-right {
+            right: 2px;
+            border-right: 4px solid currentColor;
+            border-bottom-color: currentColor;
+            border-bottom-right-radius: 12px;
+        }
+
+        .assistant-mic .mic-tail {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 4px;
+            height: 6px;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: currentColor;
         }
 
         /* Irrigation dashboard */
@@ -724,38 +782,26 @@
             }
 
             #appHeader > div {
-                padding: 8px 14px 10px;
+                padding: 12px 12px 14px;
+                min-height: 78px;
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
-                gap: 12px;
+                justify-content: center;
                 position: relative;
             }
 
             #appHeader .header-brand {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 2px;
-                min-width: 96px;
-                flex-shrink: 0;
+                display: none;
             }
 
             #appHeader .header-actions {
-                flex: 1;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
+                width: 100%;
+                max-width: 360px;
+                margin: 0 auto;
+                display: flex;
                 align-items: center;
-                gap: 10px;
-            }
-
-            #dashboardToggle {
-                justify-self: start;
-            }
-
-            #weatherToggle {
-                justify-self: end;
+                justify-content: space-between;
+                gap: 8px;
             }
 
             #appHeader h1 {
@@ -784,54 +830,58 @@
             }
 
             #appHeader .weather-btn {
-                width: 42px;
-                height: 36px;
+                width: 46px;
+                height: 46px;
                 padding: 0;
-                border-radius: 11px;
+                border-radius: 12px;
                 background: #ffffff;
                 box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.28);
             }
 
             #appHeader .mobile-command-btn {
-                position: absolute !important;
-                left: 50%;
-                width: 58px;
-                height: 58px;
+                position: relative !important;
+                width: 70px;
+                height: 70px;
                 border-radius: 999px;
-                border: 2px solid rgba(16, 185, 129, 0.65);
-                background: radial-gradient(circle at 30% 25%, #34d399 0%, #10b981 55%, #059669 100%);
-                color: #ffffff;
+                border: 2px solid #e5e7eb;
+                background: #ffffff;
+                color: #111827;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                transform: translate(-50%, -16px);
-                box-shadow: 0 12px 26px rgba(16, 185, 129, 0.45), 0 0 0 8px rgba(16, 185, 129, 0.12);
+                transform: translateY(-10px);
+                box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2);
                 transition: transform 0.2s ease, box-shadow 0.2s ease;
                 z-index: 3;
             }
 
+            #appHeader .mobile-command-btn .assistant-mic {
+                transform: translateY(2px);
+            }
+
+            #dashboardToggle { order: 1; }
+            #recordsToggle { order: 2; }
+            #mobileCommandBtn { order: 3; }
+            #pushToggle { order: 4; }
+            #weatherToggle { order: 5; }
+
             #appHeader .mobile-command-btn::after {
-                content: '';
-                position: absolute;
-                inset: -8px;
-                border-radius: 999px;
-                border: 2px solid rgba(16, 185, 129, 0.22);
-                animation: mic-ring 1.8s ease-out infinite;
+                display: none;
             }
 
             #appHeader .mobile-command-btn.listening {
-                border-color: #ef4444;
-                background: radial-gradient(circle at 30% 25%, #f87171 0%, #ef4444 55%, #dc2626 100%);
-                animation: pulse-red 1.5s infinite;
+                border-color: #93c5fd;
+                box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.18), 0 8px 18px rgba(15, 23, 42, 0.2);
+                animation: pulse-red 1.2s infinite;
             }
 
             #appHeader .mobile-command-btn:active {
-                transform: translate(-50%, -14px) scale(0.98);
+                transform: translateY(-9px) scale(0.98);
             }
 
             #appMain {
                 padding-top: 0.85rem;
-                padding-bottom: 6.6rem;
+                padding-bottom: 7.6rem;
                 padding-left: 12px;
                 padding-right: 12px;
                 display: flex;
@@ -864,6 +914,21 @@
                     #ffffff;
                 border: 1px solid rgba(148, 163, 184, 0.4);
                 box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            }
+
+            #heroSection .hero-brand-mobile {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            #heroSection .hero-brand-mobile .brand-name {
+                font-size: 1.1rem;
+                line-height: 1.15;
+                font-weight: 800;
+                color: var(--text-primary);
+                font-family: 'Inter', sans-serif;
             }
 
             #heroSection h2 {
@@ -1020,7 +1085,7 @@
     
     <!-- Header -->
     <header id="appHeader" class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-md border-b border-[var(--border-color)]" style="background: rgba(255, 255, 255, 0.8);">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="w-full px-6 py-4 flex items-center justify-between">
             <div class="header-brand flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center shadow-lg shadow-[var(--shadow-color)]">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
@@ -1029,16 +1094,12 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="font-display text-xl font-bold text-[var(--text-primary)]">Agro-Intel Hub</h1>
-                    <p class="text-xs text-[var(--accent-primary)]">Your Digital Field Partner</p>
+                    <h1 class="font-display text-xl font-bold text-[var(--text-primary)]" data-i18n="brand_title">Agrisense</h1>
+                    <p class="text-xs text-[var(--accent-primary)]" data-i18n="tagline">Your Digital Field Partner</p>
                 </div>
             </div>
             
             <div class="header-actions flex items-center gap-4">
-                <div class="status-badge status-online">
-                    <span class="indicator-dot bg-[var(--accent-primary)]"></span>
-                    Optimal
-                </div>
                 <button class="weather-btn" id="dashboardToggle">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--text-primary)]">
                         <rect x="3" y="3" width="7" height="7" rx="1"></rect>
@@ -1046,23 +1107,39 @@
                         <rect x="3" y="14" width="7" height="7" rx="1"></rect>
                         <rect x="14" y="14" width="7" height="7" rx="1"></rect>
                     </svg>
-                    <span class="hidden sm:inline">Dashboard</span>
+                    <span class="hidden sm:inline" data-i18n="nav_dashboard">Dashboard</span>
                 </button>
                 <button class="weather-btn mobile-command-btn" id="mobileCommandBtn" title="Voice Command" aria-label="Voice Command">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
-                        <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
-                        <line x1="12" y1="18" x2="12" y2="22"/>
-                        <line x1="8" y1="22" x2="16" y2="22"/>
-                    </svg>
+                    <span class="assistant-mic" aria-hidden="true">
+                        <span class="mic-stem"></span>
+                        <span class="mic-arc mic-arc-left"></span>
+                        <span class="mic-arc mic-arc-right"></span>
+                        <span class="mic-tail"></span>
+                    </span>
                 </button>
                 <button class="weather-btn" id="weatherToggle">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--text-primary)]">
                         <circle cx="12" cy="12" r="5"/>
                         <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
                     </svg>
-                    <span class="hidden sm:inline">Weather</span>
+                    <span class="hidden sm:inline" data-i18n="nav_weather">Weather</span>
                 </button>
+                <button class="weather-btn" id="recordsToggle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--text-primary)]">
+                        <path d="M4 5h16M4 12h16M4 19h16"/>
+                    </svg>
+                    <span class="hidden sm:inline" data-i18n="nav_records">Records</span>
+                </button>
+                <button class="weather-btn" id="pushToggle" title="Enable Push Notifications">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--text-primary)]">
+                        <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5"/>
+                        <path d="M9 17a3 3 0 0 0 6 0"/>
+                    </svg>
+                </button>
+                <div class="status-badge status-online">
+                    <span class="indicator-dot bg-[var(--accent-primary)]"></span>
+                    <span data-i18n="status_optimal">Optimal</span>
+                </div>
             </div>
         </div>
     </header>
@@ -1070,8 +1147,8 @@
         <!-- Weather Panel -->
     <div class="weather-panel" id="weatherPanel">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="font-display text-lg font-bold text-[var(--text-primary)]">Weather Forecast</h3>
-            <span class="text-sm text-[var(--accent-primary)]" id="weatherUpdated">Loading...</span>
+            <h3 class="font-display text-lg font-bold text-[var(--text-primary)]" data-i18n="weather_forecast">Weather Forecast</h3>
+            <span class="text-sm text-[var(--accent-primary)]" id="weatherUpdated" data-i18n="weather_updating">Loading...</span>
         </div>
 
         <div class="flex items-center gap-4 mb-3 p-4 rounded-xl" style="background: var(--bg-secondary);">
@@ -1083,8 +1160,8 @@
             </div>
             <div>
                 <div class="text-3xl font-display font-bold text-[var(--text-primary)]" id="weatherTemp">--C</div>
-                <div class="text-sm text-text-secondary" id="weatherCondition">Fetching weather...</div>
-                <div class="text-xs text-text-secondary mt-1" id="weatherLocation">Detecting your location...</div>
+                <div class="text-sm text-text-secondary" id="weatherCondition" data-i18n="weather_fetching">Fetching weather...</div>
+                <div class="text-xs text-text-secondary mt-1" id="weatherLocation" data-i18n="weather_detecting_location">Detecting your location...</div>
             </div>
         </div>
 
@@ -1092,21 +1169,21 @@
             <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
                 <div class="text-2xl mb-1">H</div>
                 <div class="text-lg font-bold text-[var(--text-primary)]" id="weatherHumidity">--%</div>
-                <div class="text-xs text-text-secondary">Humidity</div>
+                <div class="text-xs text-text-secondary" data-i18n="weather_humidity">Humidity</div>
             </div>
             <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
                 <div class="text-2xl mb-1">R</div>
                 <div class="text-lg font-bold text-[var(--text-primary)]" id="weatherRain">--%</div>
-                <div class="text-xs text-text-secondary">Rain chance</div>
+                <div class="text-xs text-text-secondary" data-i18n="weather_rain_chance">Rain chance</div>
             </div>
             <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
                 <div class="text-2xl mb-1">W</div>
                 <div class="text-lg font-bold text-[var(--text-primary)]" id="weatherWind">-- km/h</div>
-                <div class="text-xs text-text-secondary">Wind</div>
+                <div class="text-xs text-text-secondary" data-i18n="weather_wind">Wind</div>
             </div>
         </div>
 
-        <div class="text-sm text-text-secondary mb-3">5-Day Forecast</div>
+        <div class="text-sm text-text-secondary mb-3" data-i18n="weather_5_day_forecast">5-Day Forecast</div>
         <div class="flex justify-between" id="weatherDaily">
             <div class="text-center">
                 <div class="text-xs text-text-secondary">-</div>
@@ -1141,10 +1218,19 @@
         <div class="max-w-7xl mx-auto">
             <!-- Hero Section -->
             <div id="heroSection" class="text-center mb-12">
+                <div class="hero-brand-mobile">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center shadow-lg shadow-[var(--shadow-color)]">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                            <path d="M12 21v-2m0-14V3m9-2v2m-1.4-1.4l-1.44 1.44M4.84 19.16l-1.44 1.44M21 12h-2M5 12H3m16.16-6.16l-1.44-1.44M6.28 17.72l-1.44-1.44"/>
+                            <path d="M12 16a4 4 0 100-8 4 4 0 000 8z"/>
+                        </svg>
+                    </div>
+                    <div class="brand-name" data-i18n="brand_title">Agrisense</div>
+                </div>
                 <h2 class="font-display text-4xl md:text-5xl font-black text-[var(--text-primary)] mb-4">
-                    Meet Your Smart Farm Companion
+                    <span data-i18n="hero_title">Meet Your Smart Farm Companion</span>
                 </h2>
-                <p class="text-lg text-text-secondary max-w-2xl mx-auto">
+                <p class="text-lg text-text-secondary max-w-2xl mx-auto" data-i18n="hero_subtitle">
                     Friendly, intelligent, and always ready to help you grow better crops.
                 </p>
             </div>
@@ -1173,8 +1259,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-display font-bold text-[var(--text-primary)]">AI Field Advisor</h3>
-                                <p class="text-xs text-[var(--accent-primary)]">Ready for your questions.</p>
+                                <h3 class="font-display font-bold text-[var(--text-primary)]" data-i18n="chat_title">AI Field Advisor</h3>
+                                <p class="text-xs text-[var(--accent-primary)]" data-i18n="chat_ready">Ready for your questions.</p>
                             </div>
                             <select id="langSelect" class="lang-select ui-select">
                                 <option value="en-US">English</option>
@@ -1198,9 +1284,9 @@
                     
                     <!-- Quick Actions -->
                     <div class="px-5 py-3 flex gap-2 overflow-x-auto" style="background: var(--bg-card); border-top: 1px solid var(--border-color);">
-                        <button class="quick-action" onclick="quickQuestion('What crop should I grow?')">Crop suggestions</button>
-                        <button class="quick-action" onclick="quickQuestion('How is my soil health?')">Soil health</button>
-                        <button class="quick-action" onclick="quickQuestion('When will it rain?')">Rain forecast</button>
+                        <button class="quick-action" onclick="quickQuestion('q_crop')" data-i18n="quick_crop_suggestions">Crop suggestions</button>
+                        <button class="quick-action" onclick="quickQuestion('q_soil_health')" data-i18n="quick_soil_health">Soil health</button>
+                        <button class="quick-action" onclick="quickQuestion('q_rain')" data-i18n="quick_rain_forecast">Rain forecast</button>
                     </div>
                     
                     <div class="chat-input-container">
@@ -1220,7 +1306,7 @@
                                     <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
                                 </svg>
                             </button>
-                            <input type="text" class="chat-input" id="chatInput" placeholder="Ask about crops, soil, weather..." autocomplete="off">
+                            <input type="text" class="chat-input" id="chatInput" placeholder="Ask about crops, soil, weather..." autocomplete="off" data-i18n-placeholder="chat_input_placeholder">
                             <button type="submit" class="send-btn">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
@@ -1236,10 +1322,10 @@
                 <!-- Soil Dashboard -->
                 <div class="soil-card" id="dashboardSection">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="font-display text-lg font-bold text-[var(--text-primary)]">Live Field Conditions</h3>
+                        <h3 class="font-display text-lg font-bold text-[var(--text-primary)]" data-i18n="field_conditions">Live Field Conditions</h3>
                         <span class="text-xs text-[var(--accent-primary)] flex items-center gap-2">
                             <span class="indicator-dot bg-[var(--accent-primary)]" style="animation: none;"></span>
-                            Live Feed
+                            <span data-i18n="live_feed">Live Feed</span>
                         </span>
                     </div>
                     
@@ -1252,8 +1338,8 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="text-sm font-semibold text-text-primary">Moisture</div>
-                                <div class="text-xs text-text-secondary">Optimal Level</div>
+                                <div class="text-sm font-semibold text-text-primary" data-i18n="label_moisture">Moisture</div>
+                                <div class="text-xs text-text-secondary" data-i18n="label_optimal_level">Optimal Level</div>
                             </div>
                         </div>
                         <!-- Soil pH -->
@@ -1264,8 +1350,8 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="text-sm font-semibold text-text-primary">pH Level</div>
-                                <div class="text-xs text-text-secondary">Near Neutral</div>
+                                <div class="text-sm font-semibold text-text-primary" data-i18n="label_ph_level">pH Level</div>
+                                <div class="text-xs text-text-secondary" data-i18n="label_near_neutral">Near Neutral</div>
                             </div>
                         </div>
                         <!-- Soil Temperature -->
@@ -1276,8 +1362,8 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="text-sm font-semibold text-text-primary">Temperature</div>
-                                <div class="text-xs text-text-secondary">Ideal for Germination</div>
+                                <div class="text-sm font-semibold text-text-primary" data-i18n="label_temperature">Temperature</div>
+                                <div class="text-xs text-text-secondary" data-i18n="label_ideal_germination">Ideal for Germination</div>
                             </div>
                         </div>
                         <!-- Nitrogen Level -->
@@ -1288,8 +1374,8 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="text-sm font-semibold text-text-primary">Nitrogen</div>
-                                <div class="text-xs text-text-secondary">Needs Improvement</div>
+                                <div class="text-sm font-semibold text-text-primary" data-i18n="label_nitrogen">Nitrogen</div>
+                                <div class="text-xs text-text-secondary" data-i18n="label_needs_improvement">Needs Improvement</div>
                             </div>
                         </div>
                     </div>
@@ -1298,42 +1384,42 @@
                 <div class="irrigation-card" id="irrigationControl">
                     <div class="flex items-center justify-between mb-5">
                         <div class="flex items-center gap-3">
-                            <div><h3 class="irrigation-heading">Irrigation Control</h3><div class="irrigation-subtitle">Smart valve automation with soil-based calibration</div></div>
+                            <div><h3 class="irrigation-heading" data-i18n="irrigation_control">Irrigation Control</h3><div class="irrigation-subtitle" data-i18n="irrigation_subtitle">Smart valve automation with soil-based calibration</div></div>
                             <span class="irrigation-badge" id="modeBadge">AUTO MODE</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button id="autoModeBtn" class="mode-btn active" type="button">Auto</button>
-                            <button id="manualModeBtn" class="mode-btn" type="button">Manual</button>
+                            <button id="autoModeBtn" class="mode-btn active" type="button" data-i18n="auto_mode_short">Auto</button>
+                            <button id="manualModeBtn" class="mode-btn" type="button" data-i18n="manual_mode_short">Manual</button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-4">
                             <div class="status-row">
-                                <div class="status-label">System Status</div>
+                                <div class="status-label" data-i18n="system_status">System Status</div>
                                 <div class="flex items-center gap-2">
-                                    <button id="irrigationStartBtn" class="irrigation-action-btn" type="button">Start</button>
+                                    <button id="irrigationStartBtn" class="irrigation-action-btn" type="button" data-i18n="start">Start</button>
                                     <button id="systemStatusToggle" class="toggle-switch active" type="button" aria-label="Toggle irrigation system"></button>
                                 </div>
                             </div>
 
                             <div>
-                                <div class="irrigation-label">SOIL CALIBRATION</div>
+                                <div class="irrigation-label" data-i18n="soil_calibration">SOIL CALIBRATION</div>
                                 <select id="soilCalibrationSelect" class="irrigation-select ui-select">
-                                    <option value="sandy">Sandy Soil</option>
-                                    <option value="loamy">Loamy Soil</option>
-                                    <option value="clay">Clay Soil</option>
-                                    <option value="silty">Silty Soil</option>
+                                    <option value="sandy" data-i18n="soil_sandy">Sandy Soil</option>
+                                    <option value="loamy" data-i18n="soil_loamy">Loamy Soil</option>
+                                    <option value="clay" data-i18n="soil_clay">Clay Soil</option>
+                                    <option value="silty" data-i18n="soil_silty">Silty Soil</option>
                                 </select>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="irrigation-metric">
-                                    <div class="irrigation-metric-title">Moisture Range</div>
+                                    <div class="irrigation-metric-title" data-i18n="moisture_range">Moisture Range</div>
                                     <div id="soilMoistureRange" class="irrigation-metric-value">10% - 25%</div>
                                 </div>
                                 <div class="irrigation-metric">
-                                    <div class="irrigation-metric-title">Drainage</div>
+                                    <div class="irrigation-metric-title" data-i18n="drainage">Drainage</div>
                                     <div id="soilDrainage" class="irrigation-metric-value" style="color:#38bdf8;">Fast</div>
                                 </div>
                             </div>
@@ -1341,14 +1427,14 @@
 
                         <div class="valve-panel">
                             <button id="mainValvePower" class="power-btn" type="button" aria-label="Toggle main valve"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v8"></path><path d="M7.5 4.8a8 8 0 1 0 9 0"></path></svg></button>
-                            <div class="valve-title">MAIN VALVE</div>
+                            <div class="valve-title" data-i18n="main_valve">MAIN VALVE</div>
                             <div id="sensorStatusText" class="sensor-status off">SENSOR OFF</div>
                             <div id="mainValveState" class="valve-state">CLOSED</div>
                             <div id="mainValveReason" class="text-xs text-text-secondary">Auto mode will manage based on moisture.</div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Feature Cards -->
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                     <div class="feature-card" onclick="askAbout('crops')">
@@ -1357,7 +1443,7 @@
                                 <path d="M12 2L12 22M12 2C12 2 8 6 8 10C8 14 12 18 12 18M12 2C12 2 16 6 16 10C16 14 12 18 12 18"/>
                             </svg>
                         </div>
-                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Crop Advisory</h4>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm" data-i18n="feature_crop">Crop Advisory</h4>
                     </div>
                     
                     <div class="feature-card" onclick="askAbout('irrigation')">
@@ -1367,7 +1453,7 @@
                                 <circle cx="12" cy="12" r="4"/>
                             </svg>
                         </div>
-                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Irrigation</h4>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm" data-i18n="feature_irrigation">Irrigation</h4>
                     </div>
                     
                     <div class="feature-card" onclick="askAbout('fertilizer')">
@@ -1376,7 +1462,7 @@
                                 <path d="M7 21h10M12 21V11M12 11C12 11 8 7 8 4C8 4 12 4 12 4C12 4 16 4 16 4C16 7 12 11 12 11"/>
                             </svg>
                         </div>
-                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Fertilizer</h4>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm" data-i18n="feature_fertilizer">Fertilizer</h4>
                     </div>
                     
                     <div class="feature-card" onclick="askAbout('pests')">
@@ -1385,7 +1471,7 @@
                                 <path d="M12 9v2M12 15h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
                             </svg>
                         </div>
-                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Pest Alerts</h4>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm" data-i18n="feature_pest">Pest Alerts</h4>
                     </div>
                     
                     <div class="feature-card" onclick="askAbout('market')">
@@ -1394,7 +1480,7 @@
                                 <path d="M3 3v18h18M9 17V9M13 17V5M17 17v-4"/>
                             </svg>
                         </div>
-                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Market Prices</h4>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm" data-i18n="feature_market">Market Prices</h4>
                     </div>
                     
                     <div class="feature-card" onclick="askAbout('health')">
@@ -1403,7 +1489,7 @@
                                 <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                             </svg>
                         </div>
-                        <h4 class="font-semibold text-[var(--text-primary)] text-sm">Soil Health</h4>
+                        <h4 class="font-semibold text-[var(--text-primary)] text-sm" data-i18n="feature_soil_health">Soil Health</h4>
                     </div>
                 </div>
             </div>
@@ -1419,6 +1505,7 @@
         const speakerBtn = document.getElementById('speakerBtn');
         const langSelect = document.getElementById('langSelect');
         const teluguStyle = document.getElementById('teluguStyle');
+        const LANGUAGE_STORAGE_KEY = 'AGRISENSE_LANG';
         const ttsSupported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
         let ttsEnabled = true;
         
@@ -1446,6 +1533,163 @@
         const API_BASE_URL = resolveApiBaseUrl();
         const CHAT_API_URL = API_BASE_URL + '/api/chat';
         const SENSOR_API_URL = API_BASE_URL + '/data';
+        const recordsToggle = document.getElementById('recordsToggle');
+        const i18n = {
+            "en-US": {
+                brand_title: "Agrisense",
+                tagline: "Your Digital Field Partner",
+                status_optimal: "Optimal",
+                nav_dashboard: "Dashboard",
+                nav_weather: "Weather",
+                nav_records: "Records",
+                voice_command: "Voice Command",
+                voice_output_on: "Voice Output On",
+                voice_output_off: "Voice Output Off",
+                weather_forecast: "Weather Forecast",
+                weather_fetching: "Fetching weather...",
+                weather_detecting_location: "Detecting your location...",
+                weather_humidity: "Humidity",
+                weather_rain_chance: "Rain chance",
+                weather_wind: "Wind",
+                weather_5_day_forecast: "5-Day Forecast",
+                hero_title: "Meet Your Smart Farm Companion",
+                hero_subtitle: "Friendly, intelligent, and always ready to help you grow better crops.",
+                chat_title: "AI Field Advisor",
+                chat_ready: "Ready for your questions.",
+                chat_input_placeholder: "Ask about crops, soil, weather...",
+                quick_crop_suggestions: "Crop suggestions",
+                quick_soil_health: "Soil health",
+                quick_rain_forecast: "Rain forecast",
+                field_conditions: "Live Field Conditions",
+                live_feed: "Live Feed",
+                label_moisture: "Moisture",
+                label_optimal_level: "Optimal Level",
+                label_ph_level: "pH Level",
+                label_near_neutral: "Near Neutral",
+                label_temperature: "Temperature",
+                label_ideal_germination: "Ideal for Germination",
+                label_nitrogen: "Nitrogen",
+                label_needs_improvement: "Needs Improvement",
+                irrigation_control: "Irrigation Control",
+                irrigation_subtitle: "Smart valve automation with soil-based calibration",
+                auto_mode_short: "Auto",
+                manual_mode_short: "Manual",
+                system_status: "System Status",
+                start: "Start",
+                soil_calibration: "SOIL CALIBRATION",
+                soil_sandy: "Sandy Soil",
+                soil_loamy: "Loamy Soil",
+                soil_clay: "Clay Soil",
+                soil_silty: "Silty Soil",
+                moisture_range: "Moisture Range",
+                drainage: "Drainage",
+                main_valve: "MAIN VALVE",
+                records_title: "Farmer Year-wise Records",
+                records_badge: "JSON Organizer",
+                records_subtitle: "Paste farmer data and generate structured year-wise cards with profit and soil-health trends.",
+                input_json: "Input JSON",
+                output_json: "Output JSON",
+                records_input_placeholder: "Paste farmer records JSON here...",
+                organize_records: "Organize Records",
+                feature_crop: "Crop Advisory",
+                feature_irrigation: "Irrigation",
+                feature_fertilizer: "Fertilizer",
+                feature_pest: "Pest Alerts",
+                feature_market: "Market Prices",
+                feature_soil_health: "Soil Health",
+                greet: "Hello! I'm AgroBot. I can help you with crop recommendations, soil analysis, and more. Select your language above!",
+                chat_empty_reply: "I received an empty response. Please try again.",
+                chat_server_issue: "I'm having trouble reaching the server",
+                chat_https_tip: "This page is HTTPS but your API is HTTP. Use an HTTPS backend URL.",
+                chat_api_base_tip: "Set backend URL with localStorage.setItem('AGROBOT_API_BASE_URL','https://your-backend-domain') and refresh.",
+                weather_update: "Weather update",
+                weather_using_approx_location: "Using approximate location",
+                weather_using_default_location: "Using default location",
+                weather_updating: "Updating...",
+                weather_unavailable: "Unavailable",
+                weather_fetch_failed: "Weather fetch failed",
+                weather_check_internet: "Check internet and try again",
+                live_source_prefix: "Live",
+                mode_auto: "AUTO MODE",
+                mode_manual: "MANUAL MODE",
+                sensor_on: "SENSOR ON",
+                sensor_off: "SENSOR OFF",
+                valve_open: "OPEN",
+                valve_closed: "CLOSED",
+                drainage_fast: "Fast",
+                drainage_balanced: "Balanced",
+                drainage_slow: "Slow",
+                drainage_moderate: "Moderate",
+                irrigation_waiting_sensor: "Sensor feed unavailable. Waiting for live sensor data.",
+                irrigation_system_off: "System is OFF. Main valve forced CLOSED.",
+                irrigation_auto_opened: "Auto mode opened valve: moisture {moisture}% is below {min}%.",
+                irrigation_auto_closed: "Auto mode kept valve closed: moisture {moisture}% is within target.",
+                irrigation_manual_active: "Manual mode active. Power button controls main valve.",
+                status_success: "Success",
+                status_organizing: "Organizing...",
+                status_request_failed: "Request failed",
+                status_invalid_json: "Invalid JSON input",
+                nav_prompt: "Navigation command: weather, dashboard, records, chat, irrigation, home",
+                nav_not_recognized: "Command not recognized. Try: weather, dashboard, records, chat, irrigation, or home.",
+                nav_voice_not_recognized: "Command not recognized. Say: weather, dashboard, records, chat, irrigation, or home.",
+                level_high: "High",
+                level_med: "Med",
+                level_low: "Low",
+                q_crop: "What crop should I grow this season?",
+                q_soil_health: "How is my soil health?",
+                q_rain: "When will it rain?",
+                q_irrigation: "What are the irrigation recommendations?",
+                q_fertilizer: "What fertilizer should I use?",
+                q_pests: "Are there any pest alerts?",
+                q_market: "What are the current market prices?"
+            },
+            "hi-IN": {
+                tagline: "आपका डिजिटल खेत साथी", nav_dashboard: "डैशबोर्ड", nav_weather: "मौसम", nav_records: "रिकॉर्ड्स", voice_command: "वॉइस कमांड", voice_output_on: "वॉइस आउटपुट चालू", voice_output_off: "वॉइस आउटपुट बंद", hero_title: "आपका स्मार्ट खेती साथी", hero_subtitle: "सरल और समझदार सहायता, बेहतर खेती के लिए।", chat_title: "एआई खेत सलाहकार", chat_ready: "आपके सवालों के लिए तैयार।", chat_input_placeholder: "फसल, मिट्टी, मौसम के बारे में पूछें...", quick_crop_suggestions: "फसल सुझाव", quick_soil_health: "मिट्टी स्वास्थ्य", quick_rain_forecast: "बारिश पूर्वानुमान", records_title: "किसान वर्षवार रिकॉर्ड्स", records_badge: "JSON आयोजक", records_subtitle: "किसान डेटा पेस्ट करें और वर्षवार कार्ड व ट्रेंड बनाएं।", input_json: "इनपुट JSON", output_json: "आउटपुट JSON", organize_records: "रिकॉर्ड्स व्यवस्थित करें", records_input_placeholder: "यहां किसान रिकॉर्ड्स JSON पेस्ट करें...", status_organizing: "प्रोसेस हो रहा है...", status_success: "सफल", status_request_failed: "अनुरोध विफल", status_invalid_json: "अमान्य JSON इनपुट", weather_forecast: "मौसम पूर्वानुमान", weather_fetching: "मौसम लाया जा रहा है...", weather_detecting_location: "स्थान पता किया जा रहा है...", weather_humidity: "नमी", weather_rain_chance: "बारिश संभावना", weather_wind: "हवा", weather_5_day_forecast: "5-दिन पूर्वानुमान", weather_updating: "अपडेट हो रहा है...", weather_unavailable: "उपलब्ध नहीं", weather_fetch_failed: "मौसम नहीं मिला", weather_check_internet: "इंटरनेट जांचें और फिर प्रयास करें", weather_using_approx_location: "अनुमानित स्थान उपयोग में", weather_using_default_location: "डिफ़ॉल्ट स्थान उपयोग में", status_optimal: "उत्तम", field_conditions: "लाइव खेत स्थिति", live_feed: "लाइव फीड", irrigation_control: "सिंचाई नियंत्रण", irrigation_subtitle: "मिट्टी आधारित स्मार्ट वाल्व ऑटोमेशन", system_status: "सिस्टम स्थिति", start: "शुरू", nav_prompt: "कमांड: मौसम, डैशबोर्ड, रिकॉर्ड्स, चैट, सिंचाई, होम", nav_not_recognized: "कमांड समझ नहीं आई। कोशिश करें: मौसम, डैशबोर्ड, रिकॉर्ड्स, चैट, सिंचाई, होम।", nav_voice_not_recognized: "कमांड समझ नहीं आई। बोलें: मौसम, डैशबोर्ड, रिकॉर्ड्स, चैट, सिंचाई, होम।", greet: "नमस्ते! मैं AgroBot हूँ। मैं फसल, मिट्टी और खेती में मदद कर सकता हूँ।", chat_empty_reply: "खाली उत्तर मिला। कृपया फिर प्रयास करें।", chat_server_issue: "सर्वर से जुड़ने में समस्या है", chat_https_tip: "यह पेज HTTPS है लेकिन API HTTP है। HTTPS API उपयोग करें।", chat_api_base_tip: "localStorage.setItem('AGROBOT_API_BASE_URL','https://your-backend-domain') सेट करें और रिफ्रेश करें।", level_high: "उच्च", level_med: "मध्यम", level_low: "कम", q_crop: "इस मौसम में कौन सी फसल उगाऊं?", q_soil_health: "मेरी मिट्टी का स्वास्थ्य कैसा है?", q_rain: "बारिश कब होगी?", q_irrigation: "सिंचाई के लिए क्या सलाह है?", q_fertilizer: "कौन सी खाद उपयोग करूं?", q_pests: "क्या कोई कीट चेतावनी है?", q_market: "वर्तमान बाजार कीमतें क्या हैं?"
+            },
+            "te-IN": {
+                tagline: "మీ డిజిటల్ వ్యవసాయ భాగస్వామి", nav_dashboard: "డ్యాష్‌బోర్డ్", nav_weather: "వాతావరణం", nav_records: "రికార్డులు", voice_command: "వాయిస్ కమాండ్", voice_output_on: "వాయిస్ అవుట్‌పుట్ ఆన్", voice_output_off: "వాయిస్ అవుట్‌పుట్ ఆఫ్", hero_title: "మీ స్మార్ట్ వ్యవసాయ సహచారి", hero_subtitle: "సులభమైన, స్పష్టమైన సూచనలు మీ మంచి పంట కోసం.", chat_title: "AI ఫీల్డ్ సలహాదారు", chat_ready: "మీ ప్రశ్నలకు సిద్ధంగా ఉంది.", chat_input_placeholder: "పంటలు, నేల, వాతావరణం గురించి అడగండి...", quick_crop_suggestions: "పంట సూచనలు", quick_soil_health: "నేల ఆరోగ్యం", quick_rain_forecast: "వర్ష సూచన", records_title: "రైతు సంవత్సరం వారీ రికార్డులు", records_badge: "JSON ఆర్గనైజర్", records_subtitle: "రైతు డేటా పెట్టి సంవత్సరం వారీ కార్డులు మరియు ట్రెండ్‌లు పొందండి.", input_json: "ఇన్‌పుట్ JSON", output_json: "అవుట్‌పుట్ JSON", organize_records: "రికార్డులను సవరించు", records_input_placeholder: "రైతు రికార్డుల JSON ఇక్కడ పెట్టండి...", status_organizing: "సవరించడం జరుగుతోంది...", status_success: "విజయం", status_request_failed: "అభ్యర్థన విఫలమైంది", status_invalid_json: "తప్పు JSON ఇన్‌పుట్", weather_forecast: "వాతావరణ సూచన", weather_fetching: "వాతావరణం తెస్తోంది...", weather_detecting_location: "మీ లొకేషన్ తెలుసుకుంటోంది...", weather_humidity: "ఆర్ద్రత", weather_rain_chance: "వర్ష అవకాశము", weather_wind: "గాలి వేగం", weather_5_day_forecast: "5-రోజుల సూచన", weather_updating: "అప్‌డేట్ అవుతోంది...", weather_unavailable: "లభ్యం కాదు", weather_fetch_failed: "వాతావరణ డేటా తీసుకోలేకపోయింది", weather_check_internet: "ఇంటర్నెట్ చూసి మళ్లీ ప్రయత్నించండి", weather_using_approx_location: "అంచనా లొకేషన్ వాడుతోంది", weather_using_default_location: "డిఫాల్ట్ లొకేషన్ వాడుతోంది", status_optimal: "ఉత్తమం", field_conditions: "ప్రత్యక్ష పొల పరిస్థితులు", live_feed: "లైవ్ ఫీడ్", irrigation_control: "పారుదల నియంత్రణ", irrigation_subtitle: "నేల ఆధారిత స్మార్ట్ వాల్వ్ ఆటోమేషన్", system_status: "సిస్టమ్ స్థితి", start: "ప్రారంభించు", nav_prompt: "కమాండ్: వాతావరణం, డ్యాష్‌బోర్డ్, రికార్డులు, చాట్, పారుదల, హోమ్", nav_not_recognized: "కమాండ్ గుర్తించలేకపోయాం. ప్రయత్నించండి: వాతావరణం, డ్యాష్‌బోర్డ్, రికార్డులు, చాట్, పారుదల, హోమ్.", nav_voice_not_recognized: "కమాండ్ గుర్తించలేకపోయాం. చెప్పండి: వాతావరణం, డ్యాష్‌బోర్డ్, రికార్డులు, చాట్, పారుదల, హోమ్.", greet: "హలో! నేను AgroBot. పంటలు, నేల మరియు వ్యవసాయ సూచనల్లో సహాయం చేస్తాను.", chat_empty_reply: "ఖాళీ సమాధానం వచ్చింది. మళ్లీ ప్రయత్నించండి.", chat_server_issue: "సర్వర్‌కు కనెక్ట్ కాలేకపోతున్నాను", chat_https_tip: "ఈ పేజీ HTTPSలో ఉంది, కానీ API HTTPలో ఉంది. HTTPS API వాడండి.", chat_api_base_tip: "localStorage.setItem('AGROBOT_API_BASE_URL','https://your-backend-domain') సెట్ చేసి రిఫ్రెష్ చేయండి.", level_high: "అధికం", level_med: "మధ్యస్థం", level_low: "తక్కువ", q_crop: "ఈ సీజన్‌లో ఏ పంట వేయాలి?", q_soil_health: "నా నేల ఆరోగ్యం ఎలా ఉంది?", q_rain: "వర్షం ఎప్పుడు పడుతుంది?", q_irrigation: "పారుదలపై సూచనలు ఏమిటి?", q_fertilizer: "ఏ ఎరువు వాడాలి?", q_pests: "పురుగు హెచ్చరికలేమైనా ఉన్నాయా?", q_market: "ప్రస్తుత మార్కెట్ ధరలు ఏమిటి?"
+            },
+            "ta-IN": {
+                tagline: "உங்கள் டிஜிட்டல் விவசாய துணை", nav_dashboard: "டாஷ்போர்டு", nav_weather: "வானிலை", nav_records: "பதிவுகள்", voice_command: "குரல் கட்டளை", voice_output_on: "குரல் பதில் இயக்கம்", voice_output_off: "குரல் பதில் நிறுத்தம்", hero_title: "உங்கள் ஸ்மார்ட் விவசாய துணை", hero_subtitle: "எளிய மற்றும் பயனுள்ள வழிகாட்டல் நல்ல விளைச்சலுக்கு.", chat_title: "AI வயல் ஆலோசகர்", chat_ready: "உங்கள் கேள்விகளுக்கு தயார்.", chat_input_placeholder: "பயிர், மண், வானிலை பற்றி கேளுங்கள்...", quick_crop_suggestions: "பயிர் பரிந்துரை", quick_soil_health: "மண் ஆரோக்கியம்", quick_rain_forecast: "மழை முன்னறிவு", records_title: "விவசாயி வருட வாரியான பதிவுகள்", records_badge: "JSON அமைப்பான்", records_subtitle: "விவசாயி தரவை ஒட்டி வருட கார்ட்கள் மற்றும் போக்கு உருவாக்கவும்.", input_json: "உள்ளீட்டு JSON", output_json: "வெளியீட்டு JSON", organize_records: "பதிவுகளை ஒழுங்குபடுத்து", records_input_placeholder: "விவசாயி பதிவுகள் JSON ஐ இங்கு ஒட்டவும்...", status_organizing: "ஒழுங்குபடுத்தப்படுகிறது...", status_success: "வெற்றி", status_request_failed: "கோரிக்கை தோல்வி", status_invalid_json: "தவறான JSON உள்ளீடு", weather_forecast: "வானிலை முன்னறிவு", weather_fetching: "வானிலை பெறப்படுகிறது...", weather_detecting_location: "உங்கள் இடம் கண்டறியப்படுகிறது...", weather_humidity: "ஈரப்பதம்", weather_rain_chance: "மழை வாய்ப்பு", weather_wind: "காற்று", weather_5_day_forecast: "5 நாள் முன்னறிவு", status_optimal: "சிறந்தது", field_conditions: "நேரடி வயல் நிலை", live_feed: "நேரடி தகவல்", system_status: "அமைப்பு நிலை", start: "தொடங்கு", nav_prompt: "கட்டளை: வானிலை, டாஷ்போர்டு, பதிவுகள், சாட், பாசனம், ஹோம்", nav_not_recognized: "கட்டளை அறியப்படவில்லை. முயற்சி: வானிலை, டாஷ்போர்டு, பதிவுகள், சாட், பாசனம், ஹோம்.", nav_voice_not_recognized: "கட்டளை அறியப்படவில்லை. சொல்லுங்கள்: வானிலை, டாஷ்போர்டு, பதிவுகள், சாட், பாசனம், ஹோம்.", greet: "வணக்கம்! நான் AgroBot. பயிர் மற்றும் மண் பற்றிய உதவி தருகிறேன்.", chat_empty_reply: "காலியான பதில் கிடைத்தது. மீண்டும் முயற்சிக்கவும்.", chat_server_issue: "சேவையகத்தை அணுக சிரமம்", chat_https_tip: "இந்த பக்கம் HTTPS, ஆனால் API HTTP. HTTPS API பயன்படுத்தவும்.", chat_api_base_tip: "localStorage.setItem('AGROBOT_API_BASE_URL','https://your-backend-domain') அமைத்து புதுப்பிக்கவும்.", level_high: "அதிகம்", level_med: "நடுத்தரம்", level_low: "குறைவு", q_crop: "இந்த பருவத்தில் எந்த பயிர் போடலாம்?", q_soil_health: "என் மண் ஆரோக்கியம் எப்படி உள்ளது?", q_rain: "மழை எப்போது வரும்?", q_irrigation: "பாசன பரிந்துரைகள் என்ன?", q_fertilizer: "எந்த உரம் பயன்படுத்த வேண்டும்?", q_pests: "பூச்சி எச்சரிக்கை ஏதும் உள்ளதா?", q_market: "தற்போதைய சந்தை விலை என்ன?"
+            },
+            "kn-IN": {
+                tagline: "ನಿಮ್ಮ ಡಿಜಿಟಲ್ ಕೃಷಿ ಸಂಗಾತಿ", nav_dashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್", nav_weather: "ಹವಾಮಾನ", nav_records: "ದಾಖಲೆಗಳು", voice_command: "ಧ್ವನಿ ಕಮಾಂಡ್", voice_output_on: "ವಾಯ್ಸ್ ಔಟ್‌ಪುಟ್ ಆನ್", voice_output_off: "ವಾಯ್ಸ್ ಔಟ್‌ಪುಟ್ ಆಫ್", hero_title: "ನಿಮ್ಮ ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಸಹಾಯಕ", hero_subtitle: "ಸರಳ ಮತ್ತು ಉಪಯುಕ್ತ ಮಾರ್ಗದರ್ಶನದಿಂದ ಉತ್ತಮ ಬೆಳೆಗೆ ಸಹಾಯ.", chat_title: "AI ಕ್ಷೇತ್ರ ಸಲಹೆಗಾರ", chat_ready: "ನಿಮ್ಮ ಪ್ರಶ್ನೆಗಳಿಗೆ ಸಿದ್ಧ.", chat_input_placeholder: "ಬೆಳೆ, ಮಣ್ಣು, ಹವಾಮಾನ ಬಗ್ಗೆ ಕೇಳಿ...", quick_crop_suggestions: "ಬೆಳೆ ಸಲಹೆಗಳು", quick_soil_health: "ಮಣ್ಣಿನ ಆರೋಗ್ಯ", quick_rain_forecast: "ಮಳೆ ಮುನ್ಸೂಚನೆ", records_title: "ರೈತರ ವರ್ಷವಾರು ದಾಖಲೆಗಳು", records_badge: "JSON ಆಯೋಜಕ", records_subtitle: "ರೈತ ಡೇಟಾ ಪೇಸ್ಟ್ ಮಾಡಿ ವರ್ಷವಾರು ಕಾರ್ಡ್‌ಗಳು ಮತ್ತು ಟ್ರೆಂಡ್ ಪಡೆಯಿರಿ.", input_json: "ಇನ್‌ಪುಟ್ JSON", output_json: "ಔಟ್‌ಪುಟ್ JSON", organize_records: "ದಾಖಲೆಗಳನ್ನು ಸಿದ್ಧಪಡಿಸಿ", records_input_placeholder: "ರೈತರ ದಾಖಲೆ JSON ಅನ್ನು ಇಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ...", status_organizing: "ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ...", status_success: "ಯಶಸ್ಸು", status_request_failed: "ವಿನಂತಿ ವಿಫಲವಾಗಿದೆ", status_invalid_json: "ಅಮಾನ್ಯ JSON ಇನ್‌ಪುಟ್", weather_forecast: "ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ", weather_fetching: "ಹವಾಮಾನ ಪಡೆಯಲಾಗುತ್ತಿದೆ...", weather_detecting_location: "ನಿಮ್ಮ ಸ್ಥಳ ಪತ್ತೆಹಚ್ಚಲಾಗುತ್ತಿದೆ...", weather_humidity: "ಆರ್ದ್ರತೆ", weather_rain_chance: "ಮಳೆಯ ಸಾಧ್ಯತೆ", weather_wind: "ಗಾಳಿ", weather_5_day_forecast: "5 ದಿನದ ಮುನ್ಸೂಚನೆ", status_optimal: "ಉತ್ತಮ", field_conditions: "ಲೈವ್ ಹೊಲ ಪರಿಸ್ಥಿತಿ", live_feed: "ಲೈವ್ ಫೀಡ್", system_status: "ವ್ಯವಸ್ಥೆಯ ಸ್ಥಿತಿ", start: "ಪ್ರಾರಂಭಿಸಿ", nav_prompt: "ಕಮಾಂಡ್: ಹವಾಮಾನ, ಡ್ಯಾಶ್‌ಬೋರ್ಡ್, ದಾಖಲೆಗಳು, ಚಾಟ್, ನೀರಾವರಿ, ಹೋಮ್", nav_not_recognized: "ಕಮಾಂಡ್ ಗುರುತಿಸಲಿಲ್ಲ. ಪ್ರಯತ್ನಿಸಿ: ಹವಾಮಾನ, ಡ್ಯಾಶ್‌ಬೋರ್ಡ್, ದಾಖಲೆಗಳು, ಚಾಟ್, ನೀರಾವರಿ, ಹೋಮ್.", nav_voice_not_recognized: "ಕಮಾಂಡ್ ಗುರುತಿಸಲಿಲ್ಲ. ಹೇಳಿ: ಹವಾಮಾನ, ಡ್ಯಾಶ್‌ಬೋರ್ಡ್, ದಾಖಲೆಗಳು, ಚಾಟ್, ನೀರಾವರಿ, ಹೋಮ್.", greet: "ನಮಸ್ಕಾರ! ನಾನು AgroBot. ಬೆಳೆ ಮತ್ತು ಮಣ್ಣಿನ ಬಗ್ಗೆ ಸಹಾಯ ಮಾಡುತ್ತೇನೆ.", chat_empty_reply: "ಖಾಲಿ ಉತ್ತರ ಬಂದಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.", chat_server_issue: "ಸರ್ವರ್‌ಗೆ ಸಂಪರ್ಕಿಸಲು ಸಮಸ್ಯೆ", chat_https_tip: "ಈ ಪುಟ HTTPS ಆದರೆ API HTTP. HTTPS API ಬಳಸಿ.", chat_api_base_tip: "localStorage.setItem('AGROBOT_API_BASE_URL','https://your-backend-domain') ಸೆಟ್ ಮಾಡಿ ಮತ್ತು ರಿಫ್ರೆಶ್ ಮಾಡಿ.", level_high: "ಹೆಚ್ಚು", level_med: "ಮಧ್ಯಮ", level_low: "ಕಡಿಮೆ", q_crop: "ಈ ಋತುವಿನಲ್ಲಿ ಯಾವ ಬೆಳೆ ಬೆಳೆಸಬೇಕು?", q_soil_health: "ನನ್ನ ಮಣ್ಣಿನ ಆರೋಗ್ಯ ಹೇಗಿದೆ?", q_rain: "ಮಳೆ ಯಾವಾಗ ಬರುತ್ತದೆ?", q_irrigation: "ನೀರಾವರಿ ಸಲಹೆಗಳು ಏನು?", q_fertilizer: "ಯಾವ ಗೊಬ್ಬರ ಬಳಸಬೇಕು?", q_pests: "ಕೀಟ ಎಚ್ಚರಿಕೆಗಳಿವೆಯೇ?", q_market: "ಈಗಿನ ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು ಏನು?"
+            }
+        };
+
+        function t(key, vars = {}) {
+            const lang = langSelect?.value || 'en-US';
+            const table = i18n[lang] || i18n['en-US'];
+            const base = i18n['en-US'][key] || key;
+            let value = table[key] || base;
+            Object.keys(vars).forEach((name) => {
+                value = value.replaceAll(`{${name}}`, String(vars[name]));
+            });
+            return value;
+        }
+
+        function applySiteTranslations() {
+            document.documentElement.lang = (langSelect?.value || 'en-US').split('-')[0];
+            document.querySelectorAll('[data-i18n]').forEach((el) => {
+                const key = el.getAttribute('data-i18n');
+                if (key) el.textContent = t(key);
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (key) el.setAttribute('placeholder', t(key));
+            });
+            if (speakerBtn) {
+                speakerBtn.title = t(ttsEnabled ? 'voice_output_on' : 'voice_output_off');
+            }
+            if (voiceBtn) voiceBtn.title = t('voice_command');
+            const navVoiceButton = document.getElementById('mobileCommandBtn');
+            if (navVoiceButton) {
+                navVoiceButton.title = t('voice_command');
+                navVoiceButton.setAttribute('aria-label', t('voice_command'));
+            }
+            if (recordsToggle) recordsToggle.title = t('nav_records');
+            updateIrrigationUI();
+        }
         
         function addMessage(content, isUser = false) {
             const messageDiv = document.createElement('div');
@@ -1462,7 +1706,7 @@
         function setTtsState() {
             if (!speakerBtn) return;
             speakerBtn.classList.toggle('muted', !ttsEnabled);
-            speakerBtn.title = ttsEnabled ? 'Voice Output On' : 'Voice Output Off';
+            speakerBtn.title = t(ttsEnabled ? 'voice_output_on' : 'voice_output_off');
         }
 
         function getBestVoiceForLang(langCode) {
@@ -1535,7 +1779,7 @@
             }
             return 'Use clear, simple standard Telugu. Avoid heavy regional slang and difficult words.';
         }
-        
+
         async function parseJsonSafe(response) {
             const raw = await response.text();
             if (!raw) return {};
@@ -1578,7 +1822,7 @@
                 if (data.reply) {
                     addMessage(data.reply);
                 } else {
-                    addMessage('I received an empty response. Please try again.');
+                    addMessage(t('chat_empty_reply'));
                 }
             } catch (error) {
                 hideTyping();
@@ -1587,9 +1831,9 @@
                     window.location.protocol === 'https:' &&
                     CHAT_API_URL.startsWith('http://');
                 const guidance = mixedContentBlocked
-                    ? 'This page is HTTPS but your API is HTTP. Use an HTTPS backend URL.'
-                    : `Set backend URL with localStorage.setItem('AGROBOT_API_BASE_URL','https://your-backend-domain') and refresh.`;
-                addMessage(`I'm having trouble reaching the server: ${error.message}. ${guidance}`);
+                    ? t('chat_https_tip')
+                    : t('chat_api_base_tip');
+                addMessage(`${t('chat_server_issue')}: ${error.message}. ${guidance}`);
             }
         }
         chatForm.addEventListener('submit', (e) => {
@@ -1601,22 +1845,22 @@
             }
         });
         
-        function quickQuestion(q) {
-            handleQuestion(q);
+        function quickQuestion(questionKey) {
+            handleQuestion(t(questionKey));
         }
         
         function askAbout(topic) {
             const questions = {
-                crops: "What crops should I grow this season?",
-                irrigation: "What are the irrigation recommendations?",
-                fertilizer: "What fertilizer should I use?",
-                pests: "Are there any pest alerts?",
-                market: "What are the current market prices?",
-                health: "How is my soil health?"
+                crops: t("q_crop"),
+                irrigation: t("q_irrigation"),
+                fertilizer: t("q_fertilizer"),
+                pests: t("q_pests"),
+                market: t("q_market"),
+                health: t("q_soil_health")
             };
             handleQuestion(questions[topic]);
         }
-        
+
         // Voice Recognition
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const speechRecognitionSupported = Boolean(SpeechRecognition);
@@ -1676,7 +1920,7 @@
                 const transcript = (event.results?.[0]?.[0]?.transcript || '').trim();
                 const ok = navigateByCommand(transcript);
                 if (!ok) {
-                    addMessage('Command not recognized. Say: weather, dashboard, chat, irrigation, or home.');
+                    addMessage(t('nav_voice_not_recognized'));
                 }
             };
         } else {
@@ -1703,12 +1947,24 @@
             speakerBtn.style.display = 'none';
         }
 
-        langSelect.addEventListener('change', updateTeluguStyleVisibility);
+        const queryLanguage = new URLSearchParams(window.location.search).get('lang') || '';
+        const savedLanguage = (window.localStorage.getItem(LANGUAGE_STORAGE_KEY) || '').trim();
+        const initialLanguage = queryLanguage || savedLanguage || 'en-US';
+        if ([...langSelect.options].some((opt) => opt.value === initialLanguage)) {
+            langSelect.value = initialLanguage;
+            window.localStorage.setItem(LANGUAGE_STORAGE_KEY, initialLanguage);
+        }
+
+        langSelect.addEventListener('change', () => {
+            window.localStorage.setItem(LANGUAGE_STORAGE_KEY, langSelect.value || 'en-US');
+            updateTeluguStyleVisibility();
+            applySiteTranslations();
+        });
         updateTeluguStyleVisibility();
         
         // Initial greeting
         setTimeout(() => {
-            addMessage("Hello! I'm AgroBot. I can help you with crop recommendations, soil analysis, and more. Select your language above!");
+            addMessage(t('greet'));
         }, 1000);
         
         // Weather toggle
@@ -1742,10 +1998,10 @@
         let liveMoisture = 72;
         let sensorOnline = false;
         const soilProfiles = {
-            sandy: { min: 10, max: 25, drainage: "Fast" },
-            loamy: { min: 20, max: 35, drainage: "Balanced" },
-            clay: { min: 30, max: 45, drainage: "Slow" },
-            silty: { min: 18, max: 32, drainage: "Moderate" },
+            sandy: { min: 10, max: 25, drainageKey: "drainage_fast" },
+            loamy: { min: 20, max: 35, drainageKey: "drainage_balanced" },
+            clay: { min: 30, max: 45, drainageKey: "drainage_slow" },
+            silty: { min: 18, max: 32, drainageKey: "drainage_moderate" },
         };
         const irrigationState = {
             systemOn: true,
@@ -1775,13 +2031,13 @@
         };
 
         function weatherLabel(code) {
-            return weatherCodeMap[Number(code)] || "Weather update";
+            return weatherCodeMap[Number(code)] || t("weather_update");
         }
 
         function updateIrrigationUI() {
             const profile = soilProfiles[soilCalibrationSelect.value] || soilProfiles.sandy;
             soilMoistureRange.textContent = `${profile.min}% - ${profile.max}%`;
-            soilDrainage.textContent = profile.drainage;
+            soilDrainage.textContent = t(profile.drainageKey);
 
             if (!sensorOnline) {
                 irrigationState.valveOpen = false;
@@ -1794,33 +2050,33 @@
             systemStatusToggle.classList.toggle('active', irrigationState.systemOn);
             autoModeBtn.classList.toggle('active', irrigationState.autoMode);
             manualModeBtn.classList.toggle('active', !irrigationState.autoMode);
-            modeBadge.textContent = irrigationState.autoMode ? 'AUTO MODE' : 'MANUAL MODE';
+            modeBadge.textContent = irrigationState.autoMode ? t('mode_auto') : t('mode_manual');
             modeBadge.style.borderColor = irrigationState.autoMode ? '#10b981' : '#f59e0b';
             modeBadge.style.color = irrigationState.autoMode ? '#10b981' : '#f59e0b';
 
             mainValvePower.classList.toggle('active', sensorOnline);
             mainValvePower.disabled = !sensorOnline;
-            sensorStatusText.textContent = sensorOnline ? 'SENSOR ON' : 'SENSOR OFF';
+            sensorStatusText.textContent = sensorOnline ? t('sensor_on') : t('sensor_off');
             sensorStatusText.classList.toggle('on', sensorOnline);
             sensorStatusText.classList.toggle('off', !sensorOnline);
-            mainValveState.textContent = irrigationState.valveOpen ? 'OPEN' : 'CLOSED';
+            mainValveState.textContent = irrigationState.valveOpen ? t('valve_open') : t('valve_closed');
 
             if (!sensorOnline) {
-                mainValveReason.textContent = 'Sensor feed unavailable. Waiting for live sensor data.';
+                mainValveReason.textContent = t('irrigation_waiting_sensor');
             } else if (!irrigationState.systemOn) {
-                mainValveReason.textContent = 'System is OFF. Main valve forced CLOSED.';
+                mainValveReason.textContent = t('irrigation_system_off');
             } else if (irrigationState.autoMode) {
                 mainValveReason.textContent = irrigationState.valveOpen
-                    ? `Auto mode opened valve: moisture ${Math.round(liveMoisture)}% is below ${profile.min}%.`
-                    : `Auto mode kept valve closed: moisture ${Math.round(liveMoisture)}% is within target.`;
+                    ? t('irrigation_auto_opened', { moisture: Math.round(liveMoisture), min: profile.min })
+                    : t('irrigation_auto_closed', { moisture: Math.round(liveMoisture) });
             } else {
-                mainValveReason.textContent = 'Manual mode active. Power button controls main valve.';
+                mainValveReason.textContent = t('irrigation_manual_active');
             }
         }
 
         function dayLabel(isoDate) {
             const date = new Date(`${isoDate}T00:00:00`);
-            return date.toLocaleDateString(undefined, { weekday: "short" });
+            return date.toLocaleDateString(langSelect?.value || undefined, { weekday: "short" });
         }
 
         function weatherIcon(label) {
@@ -1835,7 +2091,8 @@
 
         async function reverseGeocode(lat, lon) {
             try {
-                const res = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=en&count=1`);
+                const locale = (langSelect?.value || 'en-US').split('-')[0];
+                const res = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=${encodeURIComponent(locale)}&count=1`);
                 if (!res.ok) return `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
                 const data = await res.json();
                 const place = (data?.results || [])[0];
@@ -1893,17 +2150,17 @@
                 const ipPosition = await getIpBasedPosition();
                 if (ipPosition) {
                     cachedPosition = ipPosition;
-                    weatherUpdated.textContent = "Using approximate location";
+                    weatherUpdated.textContent = t("weather_using_approx_location");
                     return ipPosition;
                 }
                 cachedPosition = defaultWeatherPosition;
-                weatherUpdated.textContent = "Using default location";
+                weatherUpdated.textContent = t("weather_using_default_location");
                 return defaultWeatherPosition;
             }
         }
 
         async function fetchPreciseWeather() {
-            weatherUpdated.textContent = "Updating...";
+            weatherUpdated.textContent = t("weather_updating");
             try {
                 const position = cachedPosition || (await requestLocationPermissionOnOpen());
                 cachedPosition = position;
@@ -1917,7 +2174,7 @@
 
                 const current = weather.current || {};
                 const daily = Array.isArray(weather.daily) ? weather.daily : [];
-                const label = current.condition || "Weather update";
+                const label = current.condition || t("weather_update");
                 const tempValue = Number(current.temperature_c ?? current.temperature_2m ?? 0);
                 const humidityValue = Number(current.humidity_pct ?? current.relative_humidity_2m ?? 0);
                 const windValue = Number(current.wind_kmh ?? current.wind_speed_10m ?? 0);
@@ -1930,12 +2187,12 @@
                 const rainNow = daily.length ? Number(daily[0].rain_chance_pct ?? 0) : 0;
                 weatherRain.textContent = `${Math.round(rainNow)}%`;
                 weatherLocation.textContent = await reverseGeocode(lat, lon);
-                weatherUpdated.textContent = `Live ${sourceLabel}`;
+                weatherUpdated.textContent = `${t('live_source_prefix')} ${sourceLabel}`;
 
                 weatherDaily.innerHTML = daily.slice(0, 5).map((item) => {
                     const day = item.date || '';
                     const dayLabelText = dayLabel(day);
-                    const dayCondition = item.condition || "Weather update";
+                    const dayCondition = item.condition || t("weather_update");
                     const icon = weatherIcon(dayCondition);
                     const temp = `${Math.round(Number(item.temp_max_c ?? 0))}C`;
                     return `
@@ -1947,9 +2204,9 @@
                     `;
                 }).join("");
             } catch (error) {
-                weatherUpdated.textContent = "Unavailable";
-                weatherCondition.textContent = "Weather fetch failed";
-                weatherLocation.textContent = "Check internet and try again";
+                weatherUpdated.textContent = t("weather_unavailable");
+                weatherCondition.textContent = t("weather_fetch_failed");
+                weatherLocation.textContent = t("weather_check_internet");
                 console.error("Weather Error:", error);
             }
         }
@@ -1977,6 +2234,13 @@
                 return true;
             }
 
+            if (command.includes('record') || command.includes('data') || command.includes('year')) {
+                weatherPanel.classList.remove('active');
+                const selectedLang = encodeURIComponent(langSelect.value || 'en-US');
+                window.location.href = `/records?lang=${selectedLang}`;
+                return true;
+            }
+
             if (command.includes('irrigation') || command.includes('valve') || command.includes('water')) {
                 weatherPanel.classList.remove('active');
                 irrigationControl.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1998,6 +2262,12 @@
             }
             irrigationControl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
+        if (recordsToggle) {
+            recordsToggle.addEventListener('click', () => {
+                const selectedLang = encodeURIComponent(langSelect.value || 'en-US');
+                window.location.href = `/records?lang=${selectedLang}`;
+            });
+        }
 
         autoModeBtn.addEventListener('click', () => {
             irrigationState.autoMode = true;
@@ -2051,12 +2321,12 @@
                     startNavVoiceCommand();
                 } else {
                     const command = window.prompt(
-                        'Navigation command: weather, dashboard, chat, irrigation, home'
+                        t('nav_prompt')
                     );
                     if (command === null) return;
                     const ok = navigateByCommand(command);
                     if (!ok) {
-                        addMessage('Command not recognized. Try: weather, dashboard, chat, irrigation, or home.');
+                        addMessage(t('nav_not_recognized'));
                     }
                 }
             });
@@ -2098,7 +2368,7 @@
             document.getElementById('tempValue').textContent = temp.toFixed(0) + 'C';
             document.getElementById('tempRadial').style.setProperty('--value', (temp / 40 * 100).toFixed(0));
 
-            document.getElementById('nitrogenValue').textContent = nitrogen > 60 ? 'High' : nitrogen > 45 ? 'Med' : 'Low';
+            document.getElementById('nitrogenValue').textContent = nitrogen > 60 ? t('level_high') : nitrogen > 45 ? t('level_med') : t('level_low');
             document.getElementById('nitrogenRadial').style.setProperty('--value', nitrogen.toFixed(0));
             updateIrrigationUI();
         }
@@ -2154,6 +2424,7 @@
         }
         
         createParticles();
+        applySiteTranslations();
         
         // Scroll reveal animation
         const observerOptions = {
@@ -2176,6 +2447,77 @@
             el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             observer.observe(el);
         });
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js";
+
+        const pushButton = document.getElementById("pushToggle");
+        if (pushButton) {
+            pushButton.addEventListener("click", enablePushNotifications);
+        }
+
+        async function enablePushNotifications() {
+            try {
+                if (!("serviceWorker" in navigator) || !("Notification" in window)) {
+                    alert("Push notifications are not supported in this browser.");
+                    return;
+                }
+
+                const configRes = await fetch("/api/push/config");
+                const configPayload = await configRes.json();
+                if (!configPayload.enabled) {
+                    alert("Push is not configured on server. Set Firebase env variables first.");
+                    return;
+                }
+
+                const permission = await Notification.requestPermission();
+                if (permission !== "granted") {
+                    alert("Notification permission was not granted.");
+                    return;
+                }
+
+                const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+                const app = initializeApp(configPayload.config);
+                const messaging = getMessaging(app);
+                const token = await getToken(messaging, {
+                    vapidKey: configPayload.config.vapidKey,
+                    serviceWorkerRegistration: registration
+                });
+
+                if (!token) {
+                    alert("Unable to get push token.");
+                    return;
+                }
+
+                await fetch("/api/push/register-token", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token })
+                });
+
+                onMessage(messaging, (payload) => {
+                    const title = payload?.notification?.title || "Agrisense";
+                    const body = payload?.notification?.body || "New update available.";
+                    alert(`${title}\n${body}`);
+                });
+
+                await fetch("/api/push/send-test", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        token,
+                        title: "Agrisense",
+                        message: "Push notifications are enabled successfully."
+                    })
+                });
+
+                alert("Push notifications enabled.");
+            } catch (error) {
+                console.error("Push setup failed", error);
+                alert(`Push setup failed: ${error.message || error}`);
+            }
+        }
     </script>
 </body>
 </html>

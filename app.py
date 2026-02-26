@@ -1,17 +1,32 @@
 import os
+import json
+from datetime import datetime
 from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, Response, jsonify, request, send_from_directory
 from flask_cors import CORS
+
+try:
+    import firebase_admin
+    from firebase_admin import credentials, messaging
+except Exception:  # noqa: BLE001
+    firebase_admin = None
+    credentials = None
+    messaging = None
 
 
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+raw_allowed_origins = os.getenv("ALLOWED_ORIGINS", "").strip()
+allowed_origins = [o.strip() for o in raw_allowed_origins.split(",") if o.strip()]
+if not allowed_origins:
+    allowed_origins = ["http://127.0.0.1:5000", "http://localhost:5000"]
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
+PUSH_TOKENS_PATH = BASE_DIR / "push_tokens.json"
 
 # In-memory latest sensor values (simple start; replace with DB later if needed)
 sensor_data = {
@@ -57,24 +72,199 @@ def _format_location_context(raw_location: object) -> str:
     return ""
 
 
+def _push_config() -> dict:
+    return {
+        "apiKey": os.getenv("FIREBASE_API_KEY", "").strip(),
+        "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN", "").strip(),
+        "projectId": os.getenv("FIREBASE_PROJECT_ID", "").strip(),
+        "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET", "").strip(),
+        "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID", "").strip(),
+        "appId": os.getenv("FIREBASE_APP_ID", "").strip(),
+        "vapidKey": os.getenv("FIREBASE_VAPID_KEY", "").strip(),
+    }
+
+
+def _load_push_tokens() -> dict:
+    if not PUSH_TOKENS_PATH.exists():
+        return {}
+    try:
+        return json.loads(PUSH_TOKENS_PATH.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _save_push_tokens(tokens: dict) -> None:
+    PUSH_TOKENS_PATH.write_text(json.dumps(tokens, indent=2), encoding="utf-8")
+
+
+def _firebase_ready() -> tuple[bool, str]:
+    if firebase_admin is None or credentials is None or messaging is None:
+        return False, "firebase-admin is not installed on server."
+
+    service_account_file = os.getenv("FIREBASE_SERVICE_ACCOUNT_FILE", "").strip()
+    if not service_account_file:
+        return False, "FIREBASE_SERVICE_ACCOUNT_FILE is not configured."
+    service_account_path = Path(service_account_file)
+    if not service_account_path.is_absolute():
+        service_account_path = BASE_DIR / service_account_file
+    if not service_account_path.exists():
+        return False, f"Service account file not found: {service_account_path}"
+
+    if not firebase_admin._apps:  # type: ignore[attr-defined]
+        cred = credentials.Certificate(str(service_account_path))
+        firebase_admin.initialize_app(cred)
+    return True, ""
+
+
+def _is_authorized_admin(request_token: str) -> bool:
+    expected_token = os.getenv("ADMIN_API_TOKEN", "").strip()
+    if not expected_token:
+        # If not configured, keep backward compatibility for local/dev use.
+        return True
+    return request_token == expected_token
+
+
 @app.get("/")
 def index():
     return send_from_directory(BASE_DIR, "index.html")
 
 
-@app.route("/update", methods=["GET", "POST"])
-def update_data():
-    global sensor_data
+@app.get("/dashboard")
+def dashboard_alias():
+    return send_from_directory(BASE_DIR, "index.html")
 
+
+@app.get("/records")
+def records_page():
+    return send_from_directory(BASE_DIR, "records.html")
+
+
+@app.get("/records/<int:year>")
+def record_detail_page(year: int):
+    return send_from_directory(BASE_DIR, "records.html")
+
+
+@app.get("/api/push/config")
+def push_config():
+    cfg = _push_config()
+    enabled = all([cfg["apiKey"], cfg["projectId"], cfg["messagingSenderId"], cfg["appId"], cfg["vapidKey"]])
+    return jsonify({"enabled": enabled, "config": cfg})
+
+
+@app.post("/api/push/register-token")
+def register_push_token():
+    admin_token = request.headers.get("X-Admin-Token", "").strip()
+    if not _is_authorized_admin(admin_token):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    body = request.get_json(silent=True) or {}
+    token = str(body.get("token") or "").strip()
+    if not token:
+        return jsonify({"error": "token is required"}), 400
+
+    tokens = _load_push_tokens()
+    tokens[token] = {"created_at": datetime.utcnow().isoformat()}
+    _save_push_tokens(tokens)
+    return jsonify({"message": "Push token registered", "total_tokens": len(tokens)})
+
+
+@app.post("/api/push/send-test")
+def send_test_push():
+    admin_token = request.headers.get("X-Admin-Token", "").strip()
+    if not _is_authorized_admin(admin_token):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    body = request.get_json(silent=True) or {}
+    token = str(body.get("token") or "").strip()
+    title = str(body.get("title") or "Agrisense").strip()
+    message = str(body.get("message") or "Test push notification").strip()
+
+    ok, reason = _firebase_ready()
+    if not ok:
+        return jsonify({"error": reason}), 500
+
+    if not token:
+        return jsonify({"error": "token is required"}), 400
+
+    try:
+        msg = messaging.Message(
+            token=token,
+            notification=messaging.Notification(title=title, body=message),
+            webpush=messaging.WebpushConfig(
+                notification=messaging.WebpushNotification(
+                    title=title,
+                    body=message,
+                    icon="/favicon.ico",
+                )
+            ),
+        )
+        message_id = messaging.send(msg)
+        return jsonify({"message": "Push sent", "message_id": message_id})
+    except Exception as exc:  # noqa: BLE001
+        return jsonify({"error": f"Push send failed: {exc}"}), 500
+
+
+@app.get("/firebase-messaging-sw.js")
+def firebase_messaging_sw():
+    cfg = _push_config()
+    script = f"""
+importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js');
+
+firebase.initializeApp({json.dumps({k: cfg[k] for k in ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId']})});
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => {{
+  const title = payload?.notification?.title || 'Agrisense';
+  const options = {{
+    body: payload?.notification?.body || 'You have a new update.',
+    icon: '/favicon.ico'
+  }};
+  self.registration.showNotification(title, options);
+}});
+""".strip()
+    return Response(script, mimetype="application/javascript")
+
+
+def _authorize_sensor_client() -> tuple[bool, object | None]:
     expected_token = os.getenv("SENSOR_API_TOKEN", "").strip()
     if expected_token:
         provided_token = request.headers.get("X-Sensor-Token", "").strip()
         if provided_token != expected_token:
-            return jsonify({"error": "Unauthorized sensor client"}), 401
+            return False, (jsonify({"error": "Unauthorized sensor client"}), 401)
+    return True, None
 
+
+def _extract_sensor_payload() -> dict | None:
+    # Preferred: JSON body from modern clients.
     payload = request.get_json(silent=True)
+    if isinstance(payload, dict):
+        return payload
+
+    # ESP32 often sends x-www-form-urlencoded or multipart form-data.
+    form_payload: dict[str, object] = {}
+    for key in ("moisture", "ph", "temp", "nitrogen"):
+        value = request.form.get(key)
+        if value is not None and str(value).strip() != "":
+            form_payload[key] = value
+    if form_payload:
+        return form_payload
+
+    return None
+
+
+@app.post("/update")
+@app.post("/update-moisture")
+def update_data():
+    global sensor_data
+
+    authorized, auth_error = _authorize_sensor_client()
+    if not authorized:
+        return auth_error
+
+    payload = _extract_sensor_payload()
     if not isinstance(payload, dict):
-        return jsonify({"error": "Invalid payload. Expected JSON object."}), 400
+        return jsonify({"error": "Invalid payload. Send JSON or form data."}), 400
 
     sensor_data = {
         "moisture": payload.get("moisture", sensor_data.get("moisture", 0)),
@@ -377,4 +567,5 @@ def health():
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    debug_enabled = os.getenv("FLASK_DEBUG", "").strip().lower() in {"1", "true", "yes", "on"}
+    app.run(host="0.0.0.0", port=port, debug=debug_enabled)

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrisense - Records</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --bg-body: #f3f4f6;
+            --bg-panel: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg-body);
+            background-image: radial-gradient(var(--primary-light) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .topbar-inner {
+            width: 100%;
+            padding: 16px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 10px 22px rgba(59, 130, 246, 0.25);
+        }
+        .brand-name { font-weight: 800; color: #1e293b; font-size: 1.2rem; letter-spacing: 0.01em; }
+        .brand-tag { color: #10b981; font-size: 0.8rem; }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            justify-content: flex-end;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.12);
+            color: #16a34a;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+        }
+        .weather-btn {
+            text-decoration: none;
+            border: 1px solid #cbd5e1;
+            border-radius: 14px;
+            padding: 11px 18px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .weather-btn.active {
+            color: var(--primary-dark);
+            border-color: #b8c6dc;
+        }
+        .weather-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .main-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 18px 16px 28px;
+        }
+        .dashboard-card {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
+        }
+        .title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .year-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+        .year-card {
+            background: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .year-card.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .year-card h3 { font-size: 2rem; margin-bottom: 4px; }
+        .year-card p { color: var(--text-muted); font-weight: 600; font-size: 0.9rem; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+        .stat-item {
+            background: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            text-align: center;
+        }
+        .stat-val { font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); }
+        .stat-lbl { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+
+        .chart-box {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .chart-title { font-weight: 700; }
+        .toggle-switch {
+            display: flex;
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 4px;
+            gap: 4px;
+        }
+        .switch-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .switch-btn.active {
+            background: #fff;
+            color: var(--primary-dark);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .chart-wrap {
+            width: 100%;
+            height: clamp(260px, 42vh, 420px);
+            position: relative;
+        }
+
+        @media (max-width: 900px) {
+            .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .dashboard-card { padding: 0; }
+        }
+        @media (max-width: 640px) {
+            .year-selector,
+            .stats-grid { grid-template-columns: 1fr; }
+            .brand-tag,
+            .status-badge,
+            .weather-btn span { display: none; }
+            .weather-btn { padding: 8px 10px; font-size: 0.85rem; }
+            .brand-name { font-size: 1rem; }
+            .topbar-inner { padding: 10px 12px; }
+            .main-container { padding: 12px 10px 18px; }
+            .dashboard-card { border-radius: 0; padding: 0; }
+            .chart-box { padding: 12px; }
+            .chart-wrap { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="header-brand">
+                <div class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="brand-name" data-i18n="brand_title">Agrisense</div>
+                    <div class="brand-tag" data-i18n="tagline">Your Digital Field Partner</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="/dashboard" class="weather-btn" data-lang-link data-base-href="/dashboard">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+                    <span data-i18n="nav_dashboard">Dashboard</span>
+                </a>
+                <a href="/#weatherPanel" class="weather-btn" data-lang-link data-base-href="/#weatherPanel">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"></path></svg>
+                    <span data-i18n="nav_weather">Weather</span>
+                </a>
+                <a href="/records" class="weather-btn active" data-lang-link data-base-href="/records">
+                    <svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"></path></svg>
+                    <span data-i18n="nav_records">Records</span>
+                </a>
+                <div class="status-badge"><span class="dot"></span><span data-i18n="status_optimal">Optimal</span></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="dashboard-card">
+            <h1 class="title" data-i18n="records_graph_title">Farm Records Graph Model</h1>
+
+            <div class="year-selector">
+                <div class="year-card active" onclick="selectYear(2025, this)">
+                    <h3>2025</h3>
+                    <p data-i18n="year_current">Current Year</p>
+                </div>
+                <div class="year-card" onclick="selectYear(2024, this)">
+                    <h3>2024</h3>
+                    <p data-i18n="year_last">Last Year</p>
+                </div>
+                <div class="year-card" onclick="selectYear(2023, this)">
+                    <h3>2023</h3>
+                    <p data-i18n="year_archive">Archive</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-val" id="stat-moisture">68%</div>
+                    <div class="stat-lbl" data-i18n="stat_avg_moisture">Avg Moisture</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="stat-health">77/100</div>
+                    <div class="stat-lbl" data-i18n="stat_soil_health">Soil Health</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="stat-yield">12.5t</div>
+                    <div class="stat-lbl" data-i18n="stat_total_yield">Total Yield</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="stat-rain">950mm</div>
+                    <div class="stat-lbl" data-i18n="stat_rainfall">Rainfall</div>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-header">
+                    <div class="chart-title" data-i18n="performance_analytics">Performance Analytics</div>
+                    <div class="toggle-switch">
+                        <button class="switch-btn active" id="sw-moisture" onclick="toggleChart('moisture')" data-i18n="sw_moisture">Moisture</button>
+                        <button class="switch-btn" id="sw-health" onclick="toggleChart('health')" data-i18n="sw_health">Health</button>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const LANGUAGE_STORAGE_KEY = "AGRISENSE_LANG";
+        let currentLanguage = "en-US";
+        const i18n = {
+            "en-US": {
+                page_title: "Agrisense - Records",
+                brand_title: "Agrisense",
+                tagline: "Your Digital Field Partner",
+                nav_dashboard: "Dashboard",
+                nav_weather: "Weather",
+                nav_records: "Records",
+                status_optimal: "Optimal",
+                records_graph_title: "Farm Records Graph Model",
+                year_current: "Current Year",
+                year_last: "Last Year",
+                year_archive: "Archive",
+                stat_avg_moisture: "Avg Moisture",
+                stat_soil_health: "Soil Health",
+                stat_total_yield: "Total Yield",
+                stat_rainfall: "Rainfall",
+                performance_analytics: "Performance Analytics",
+                sw_moisture: "Moisture",
+                sw_health: "Health",
+                chart_percentage: "Percentage",
+            },
+            "hi-IN": {
+                page_title: "Agrisense - रिकॉर्ड्स",
+                brand_title: "Agrisense",
+                tagline: "आपका डिजिटल खेत साथी",
+                nav_dashboard: "डैशबोर्ड",
+                nav_weather: "मौसम",
+                nav_records: "रिकॉर्ड्स",
+                status_optimal: "उत्तम",
+                records_graph_title: "फार्म रिकॉर्ड ग्राफ मॉडल",
+                year_current: "वर्तमान वर्ष",
+                year_last: "पिछला वर्ष",
+                year_archive: "पुरालेख",
+                stat_avg_moisture: "औसत नमी",
+                stat_soil_health: "मिट्टी स्वास्थ्य",
+                stat_total_yield: "कुल उपज",
+                stat_rainfall: "वर्षा",
+                performance_analytics: "प्रदर्शन विश्लेषण",
+                sw_moisture: "नमी",
+                sw_health: "स्वास्थ्य",
+                chart_percentage: "प्रतिशत",
+            },
+            "te-IN": {
+                page_title: "Agrisense - రికార్డులు",
+                brand_title: "Agrisense",
+                tagline: "మీ డిజిటల్ వ్యవసాయ భాగస్వామి",
+                nav_dashboard: "డ్యాష్‌బోర్డ్",
+                nav_weather: "వాతావరణం",
+                nav_records: "రికార్డులు",
+                status_optimal: "ఉత్తమం",
+                records_graph_title: "వ్యవసాయ రికార్డు గ్రాఫ్ మోడల్",
+                year_current: "ప్రస్తుత సంవత్సరం",
+                year_last: "గత సంవత్సరం",
+                year_archive: "ఆర్కైవ్",
+                stat_avg_moisture: "సగటు ఆర్ద్రత",
+                stat_soil_health: "నేల ఆరోగ్యం",
+                stat_total_yield: "మొత్తం దిగుబడి",
+                stat_rainfall: "వర్షపాతం",
+                performance_analytics: "పనితీరు విశ్లేషణ",
+                sw_moisture: "ఆర్ద్రత",
+                sw_health: "ఆరోగ్యం",
+                chart_percentage: "శాతం",
+            },
+            "ta-IN": {
+                page_title: "Agrisense - பதிவுகள்",
+                brand_title: "Agrisense",
+                tagline: "உங்கள் டிஜிட்டல் விவசாய துணை",
+                nav_dashboard: "டாஷ்போர்டு",
+                nav_weather: "வானிலை",
+                nav_records: "பதிவுகள்",
+                status_optimal: "சிறந்தது",
+                records_graph_title: "பண்ணை பதிவுகள் வரைபட மாதிரி",
+                year_current: "நடப்பு ஆண்டு",
+                year_last: "கடந்த ஆண்டு",
+                year_archive: "காப்பகம்",
+                stat_avg_moisture: "சராசரி ஈரப்பதம்",
+                stat_soil_health: "மண் ஆரோக்கியம்",
+                stat_total_yield: "மொத்த விளைச்சல்",
+                stat_rainfall: "மழைப்பொழிவு",
+                performance_analytics: "செயல்திறன் பகுப்பாய்வு",
+                sw_moisture: "ஈரப்பதம்",
+                sw_health: "ஆரோக்கியம்",
+                chart_percentage: "சதவீதம்",
+            },
+            "kn-IN": {
+                page_title: "Agrisense - ದಾಖಲೆಗಳು",
+                brand_title: "Agrisense",
+                tagline: "ನಿಮ್ಮ ಡಿಜಿಟಲ್ ಕೃಷಿ ಸಂಗಾತಿ",
+                nav_dashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+                nav_weather: "ಹವಾಮಾನ",
+                nav_records: "ದಾಖಲೆಗಳು",
+                status_optimal: "ಉತ್ತಮ",
+                records_graph_title: "ಕೃಷಿ ದಾಖಲೆ ಗ್ರಾಫ್ ಮಾದರಿ",
+                year_current: "ಪ್ರಸ್ತುತ ವರ್ಷ",
+                year_last: "ಹಿಂದಿನ ವರ್ಷ",
+                year_archive: "ಸಂಗ್ರಹ",
+                stat_avg_moisture: "ಸರಾಸರಿ ತೇವಾಂಶ",
+                stat_soil_health: "ಮಣ್ಣಿನ ಆರೋಗ್ಯ",
+                stat_total_yield: "ಒಟ್ಟು ಉತ್ಪಾದನೆ",
+                stat_rainfall: "ಮಳೆಪಾತ",
+                performance_analytics: "ಕಾರ್ಯಕ್ಷಮತೆ ವಿಶ್ಲೇಷಣೆ",
+                sw_moisture: "ತೇವಾಂಶ",
+                sw_health: "ಆರೋಗ್ಯ",
+                chart_percentage: "ಶೇಕಡಾವಾರು",
+            },
+        };
+
+        const dataStore = {
+            2025: { moisture: "68%", health: "77", yield: "12.5t", rain: "950mm" },
+            2024: { moisture: "75%", health: "82", yield: "14.2t", rain: "1100mm" },
+            2023: { moisture: "62%", health: "70", yield: "10.8t", rain: "890mm" }
+        };
+
+        const chartData = {
+            years: ["2023", "2024", "2025"],
+            moisture: [62, 75, 68],
+            health: [70, 82, 77]
+        };
+
+        let chartInstance = null;
+
+        function t(key) {
+            const table = i18n[currentLanguage] || i18n["en-US"];
+            return table[key] || i18n["en-US"][key] || key;
+        }
+
+        function updateLangLinks() {
+            const lang = encodeURIComponent(currentLanguage || "en-US");
+            document.querySelectorAll("[data-lang-link]").forEach((el) => {
+                const base = el.getAttribute("data-base-href") || "/";
+                const hashIndex = base.indexOf("#");
+                const path = hashIndex >= 0 ? base.slice(0, hashIndex) : base;
+                const hash = hashIndex >= 0 ? base.slice(hashIndex) : "";
+                const separator = path.includes("?") ? "&" : "?";
+                el.setAttribute("href", `${path}${separator}lang=${lang}${hash}`);
+            });
+        }
+
+        function refreshChartTranslations() {
+            if (!chartInstance) return;
+            chartInstance.data.datasets[0].label = t("chart_percentage");
+            chartInstance.update();
+        }
+
+        function applyTranslations() {
+            document.documentElement.lang = (currentLanguage || "en-US").split("-")[0];
+            document.title = t("page_title");
+            document.querySelectorAll("[data-i18n]").forEach((el) => {
+                const key = el.getAttribute("data-i18n");
+                if (key) el.textContent = t(key);
+            });
+            updateLangLinks();
+            refreshChartTranslations();
+        }
+
+        function restoreLanguage() {
+            const queryLang = new URLSearchParams(window.location.search).get("lang") || "";
+            const savedLang = (window.localStorage.getItem(LANGUAGE_STORAGE_KEY) || "").trim();
+            const candidate = queryLang || savedLang || "en-US";
+            currentLanguage = i18n[candidate] ? candidate : "en-US";
+            window.localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLanguage);
+        }
+
+        function selectYear(year, element) {
+            document.querySelectorAll(".year-card").forEach((el) => el.classList.remove("active"));
+            element.classList.add("active");
+            const data = dataStore[year];
+            document.getElementById("stat-moisture").textContent = data.moisture;
+            document.getElementById("stat-health").textContent = `${data.health}/100`;
+            document.getElementById("stat-yield").textContent = data.yield;
+            document.getElementById("stat-rain").textContent = data.rain;
+        }
+
+        function initChart() {
+            const ctx = document.getElementById("comparisonChart").getContext("2d");
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, "#10b981");
+            gradient.addColorStop(1, "#d1fae5");
+
+            chartInstance = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: chartData.years,
+                    datasets: [{
+                        label: t("chart_percentage"),
+                        data: chartData.moisture,
+                        backgroundColor: gradient,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { callback: (v) => `${v}%` } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function toggleChart(mode) {
+            document.getElementById("sw-moisture").classList.toggle("active", mode === "moisture");
+            document.getElementById("sw-health").classList.toggle("active", mode === "health");
+            chartInstance.data.datasets[0].data = chartData[mode];
+            chartInstance.update();
+        }
+
+        window.onload = () => {
+            restoreLanguage();
+            initChart();
+            applyTranslations();
+        };
+    </script>
+</body>
+</html>
