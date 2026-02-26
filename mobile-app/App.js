@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import * as Device from "expo-device";
+import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import * as Speech from "expo-speech";
 
@@ -111,6 +112,8 @@ export default function App() {
   const [lastNetworkError, setLastNetworkError] = useState("");
   const [voiceInputAvailable, setVoiceInputAvailable] = useState(false);
   const [pushStatus, setPushStatus] = useState("Push notifications not configured yet.");
+  const [locationStatus, setLocationStatus] = useState("Location not shared yet.");
+  const [locationData, setLocationData] = useState(null);
 
   const CHAT_API_URL = useMemo(() => `${baseUrl.replace(/\/+$/, "")}/api/chat`, [baseUrl]);
   const SENSOR_API_URL = useMemo(() => `${baseUrl.replace(/\/+$/, "")}/data`, [baseUrl]);
@@ -279,6 +282,82 @@ export default function App() {
     }
   }
 
+  function confirmLocationAccess() {
+    return new Promise((resolve) => {
+      Alert.alert(
+        "Allow Location Access",
+        "AgroBot uses your location to give local farming and weather advice. Do you want to allow location access?",
+        [
+          {
+            text: "Not Now",
+            style: "cancel",
+            onPress: () => resolve(false),
+          },
+          {
+            text: "Allow",
+            onPress: () => resolve(true),
+          },
+        ]
+      );
+    });
+  }
+
+  async function requestUserLocation() {
+    try {
+      const userAccepted = await confirmLocationAccess();
+      if (!userAccepted) {
+        setLocationStatus("Location access not allowed. Answers will be generic.");
+        return null;
+      }
+
+      setLocationStatus("Requesting location permission...");
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status !== "granted") {
+        setLocationData(null);
+        setLocationStatus("Location permission denied. Answers will be generic.");
+        return null;
+      }
+
+      const position = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
+      const latitude = Number(position?.coords?.latitude);
+      const longitude = Number(position?.coords?.longitude);
+
+      let city = "";
+      let region = "";
+      let country = "";
+      try {
+        const reverse = await Location.reverseGeocodeAsync({ latitude, longitude });
+        if (Array.isArray(reverse) && reverse[0]) {
+          city = String(reverse[0].city || reverse[0].district || reverse[0].subregion || "").trim();
+          region = String(reverse[0].region || reverse[0].subregion || "").trim();
+          country = String(reverse[0].country || "").trim();
+        }
+      } catch {
+        // Reverse geocoding can fail on some emulators/offline cases.
+      }
+
+      const payload = {
+        latitude,
+        longitude,
+        city,
+        region,
+        country,
+      };
+      setLocationData(payload);
+
+      const locationLabel = [city, region, country].filter(Boolean).join(", ");
+      setLocationStatus(locationLabel ? `Location shared: ${locationLabel}` : "Location shared using coordinates.");
+      return payload;
+    } catch {
+      setLocationData(null);
+      setLocationStatus("Could not fetch location. Answers will be generic.");
+      return null;
+    }
+  }
+
   async function ask(input) {
     const trimmed = input.trim();
     if (!trimmed || sending) return;
@@ -289,6 +368,7 @@ export default function App() {
     setSending(true);
 
     try {
+      const activeLocation = locationData || (await requestUserLocation());
       const response = await fetch(CHAT_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -297,6 +377,7 @@ export default function App() {
           langName,
           teluguStyle,
           teluguStyleInstruction: getTeluguStyleInstruction(lang, teluguStyle),
+          location: activeLocation,
         }),
       });
 
@@ -390,6 +471,10 @@ export default function App() {
           </View>
           <Text style={styles.connectionText}>Using: {baseUrl}</Text>
           <Text style={styles.connectionText}>{pushStatus}</Text>
+          <Text style={styles.connectionText}>{locationStatus}</Text>
+          <Pressable onPress={requestUserLocation} style={styles.secondaryBtn}>
+            <Text style={styles.secondaryBtnText}>Share Location</Text>
+          </Pressable>
           {lastNetworkError ? <Text style={styles.errorText}>{lastNetworkError}</Text> : null}
         </View>
 
@@ -647,6 +732,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 14,
     justifyContent: "center",
+  },
+  secondaryBtn: {
+    alignSelf: "flex-start",
+    backgroundColor: "#ecfdf5",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#86efac",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  secondaryBtnText: {
+    color: "#166534",
+    fontWeight: "700",
+    fontSize: 12,
   },
   sendBtnDisabled: {
     opacity: 0.55,

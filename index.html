@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -299,6 +299,10 @@
         .weather-btn:hover {
             border-color: var(--accent-primary);
             color: var(--accent-primary);
+        }
+
+        .mobile-command-btn {
+            display: none;
         }
 
         /* Irrigation dashboard */
@@ -700,15 +704,300 @@
         }
         
         @media (max-width: 640px) {
+            body {
+                background: linear-gradient(180deg, #eff5f8 0%, #e8f0f5 100%);
+            }
+
+            .bg-grid,
+            .bg-gradient-overlay,
+            #particles {
+                opacity: 0.22;
+            }
+
+            #appHeader {
+                top: auto !important;
+                bottom: 0;
+                border-bottom: none;
+                border-top: 1px solid rgba(148, 163, 184, 0.35);
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.93) 0%, rgba(248, 250, 252, 0.98) 100%) !important;
+                box-shadow: 0 -10px 28px rgba(15, 23, 42, 0.12);
+            }
+
+            #appHeader > div {
+                padding: 8px 14px 10px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                position: relative;
+            }
+
+            #appHeader .header-brand {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 2px;
+                min-width: 96px;
+                flex-shrink: 0;
+            }
+
+            #appHeader .header-actions {
+                flex: 1;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                align-items: center;
+                gap: 10px;
+            }
+
+            #dashboardToggle {
+                justify-self: start;
+            }
+
+            #weatherToggle {
+                justify-self: end;
+            }
+
+            #appHeader h1 {
+                font-size: 0.72rem;
+                line-height: 1.05;
+                text-align: center;
+                letter-spacing: 0;
+                font-family: 'Inter', sans-serif;
+                font-weight: 700;
+            }
+
+            #appHeader .status-badge,
+            #appHeader p {
+                display: none;
+            }
+
+            #appHeader .w-12.h-12 {
+                width: 42px;
+                height: 42px;
+                border-radius: 10px;
+            }
+
+            #appHeader .w-12.h-12 svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            #appHeader .weather-btn {
+                width: 42px;
+                height: 36px;
+                padding: 0;
+                border-radius: 11px;
+                background: #ffffff;
+                box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.28);
+            }
+
+            #appHeader .mobile-command-btn {
+                position: absolute !important;
+                left: 50%;
+                width: 58px;
+                height: 58px;
+                border-radius: 999px;
+                border: 2px solid rgba(16, 185, 129, 0.65);
+                background: radial-gradient(circle at 30% 25%, #34d399 0%, #10b981 55%, #059669 100%);
+                color: #ffffff;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transform: translate(-50%, -16px);
+                box-shadow: 0 12px 26px rgba(16, 185, 129, 0.45), 0 0 0 8px rgba(16, 185, 129, 0.12);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+                z-index: 3;
+            }
+
+            #appHeader .mobile-command-btn::after {
+                content: '';
+                position: absolute;
+                inset: -8px;
+                border-radius: 999px;
+                border: 2px solid rgba(16, 185, 129, 0.22);
+                animation: mic-ring 1.8s ease-out infinite;
+            }
+
+            #appHeader .mobile-command-btn.listening {
+                border-color: #ef4444;
+                background: radial-gradient(circle at 30% 25%, #f87171 0%, #ef4444 55%, #dc2626 100%);
+                animation: pulse-red 1.5s infinite;
+            }
+
+            #appHeader .mobile-command-btn:active {
+                transform: translate(-50%, -14px) scale(0.98);
+            }
+
+            #appMain {
+                padding-top: 0.85rem;
+                padding-bottom: 6.6rem;
+                padding-left: 12px;
+                padding-right: 12px;
+                display: flex;
+                justify-content: center;
+            }
+
+            #appMain > .max-w-7xl {
+                width: min(100%, 372px);
+                max-width: 372px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            #mainGridMobile,
+            #appMain .space-y-6,
+            #appMain .soil-card,
+            #appMain .chat-container,
+            #appMain .irrigation-card {
+                width: 100%;
+            }
+
+            #heroSection {
+                margin-bottom: 10px;
+                text-align: left;
+                padding: 14px 14px;
+                border-radius: 16px;
+                background:
+                    radial-gradient(120% 120% at 100% 0%, rgba(59, 130, 246, 0.14) 0%, rgba(59, 130, 246, 0) 52%),
+                    radial-gradient(120% 120% at 0% 100%, rgba(16, 185, 129, 0.16) 0%, rgba(16, 185, 129, 0) 52%),
+                    #ffffff;
+                border: 1px solid rgba(148, 163, 184, 0.4);
+                box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            }
+
+            #heroSection h2 {
+                font-size: 1.2rem;
+                line-height: 1.2;
+                margin-bottom: 6px;
+                font-family: 'Inter', sans-serif;
+            }
+
+            #heroSection p {
+                font-size: 0.85rem;
+                line-height: 1.4;
+                color: #475569;
+            }
+
+            #mainGridMobile {
+                gap: 10px;
+                margin-bottom: 10px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            #robot-container {
+                height: 208px;
+                border-radius: 16px;
+                border: 1px solid rgba(148, 163, 184, 0.35);
+                box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+            }
+
+            #appMain .chat-container,
+            #appMain .soil-card,
+            #appMain .irrigation-card {
+                margin-left: auto;
+                margin-right: auto;
+                border-radius: 16px;
+                border-color: rgba(148, 163, 184, 0.45);
+                box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+            }
+
+            #chatSection {
+                height: 500px !important;
+            }
+
+            .chat-header {
+                padding: 12px;
+            }
+
+            .chat-messages {
+                max-height: 338px;
+                padding: 12px;
+            }
+
+            .chat-input-container {
+                padding: 10px;
+            }
+
+            .chat-input {
+                font-size: 14px;
+            }
+
+            .quick-action {
+                border-radius: 999px;
+                background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+                font-weight: 600;
+                border-color: #cbd5e1;
+            }
+
+            .quick-action:hover {
+                background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+            }
+
+            .voice-btn {
+                min-width: 44px;
+                min-height: 44px;
+            }
+
+            .send-btn {
+                padding: 0 18px;
+                min-height: 44px;
+                border-radius: 10px;
+            }
+
+            #appMain .space-y-6 {
+                gap: 10px;
+            }
+
+            #appMain .feature-card {
+                border-radius: 12px;
+                padding: 12px;
+                background:
+                    linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            }
+
+            #appMain .feature-card .feature-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 19px;
+            }
+
+            #appMain .feature-card h4 {
+                font-size: 0.98rem;
+            }
+
+            #appMain .feature-card p {
+                font-size: 0.78rem;
+            }
+
+            #appMain .irrigation-heading {
+                font-size: 1.06rem;
+            }
+
+            #appMain .status-row,
+            #appMain .valve-panel,
+            #appMain .irrigation-metric {
+                border-radius: 12px;
+            }
+
             .weather-panel {
-                width: calc(100% - 40px);
-                right: 20px;
-                left: 20px;
+                width: min(calc(100% - 24px), 372px);
+                right: 0;
+                left: 0;
+                margin: 0 auto;
+                top: auto;
+                bottom: 86px;
+                border-radius: 16px;
+                box-shadow: 0 16px 30px rgba(15, 23, 42, 0.16);
             }
             
-            #robot-container {
-                height: 350px;
-            }
+        }
+
+        @keyframes mic-ring {
+            0% { transform: scale(0.88); opacity: 0.45; }
+            70% { transform: scale(1.12); opacity: 0; }
+            100% { transform: scale(1.12); opacity: 0; }
         }
         
         /* Reduced motion */
@@ -730,9 +1019,9 @@
     <div id="particles"></div>
     
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-md border-b border-[var(--border-color)]" style="background: rgba(255, 255, 255, 0.8);">
+    <header id="appHeader" class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-md border-b border-[var(--border-color)]" style="background: rgba(255, 255, 255, 0.8);">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-4">
+            <div class="header-brand flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center shadow-lg shadow-[var(--shadow-color)]">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
                         <path d="M12 21v-2m0-14V3m9-2v2m-1.4-1.4l-1.44 1.44M4.84 19.16l-1.44 1.44M21 12h-2M5 12H3m16.16-6.16l-1.44-1.44M6.28 17.72l-1.44-1.44"/>
@@ -745,7 +1034,7 @@
                 </div>
             </div>
             
-            <div class="flex items-center gap-4">
+            <div class="header-actions flex items-center gap-4">
                 <div class="status-badge status-online">
                     <span class="indicator-dot bg-[var(--accent-primary)]"></span>
                     Optimal
@@ -758,6 +1047,14 @@
                         <rect x="14" y="14" width="7" height="7" rx="1"></rect>
                     </svg>
                     <span class="hidden sm:inline">Dashboard</span>
+                </button>
+                <button class="weather-btn mobile-command-btn" id="mobileCommandBtn" title="Voice Command" aria-label="Voice Command">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                        <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+                        <line x1="12" y1="18" x2="12" y2="22"/>
+                        <line x1="8" y1="22" x2="16" y2="22"/>
+                    </svg>
                 </button>
                 <button class="weather-btn" id="weatherToggle">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--text-primary)]">
@@ -840,10 +1137,10 @@
     </div>
 
     <!-- Main Content -->
-    <main class="relative z-10 pt-24 pb-12 px-6">
+    <main id="appMain" class="relative z-10 pt-24 pb-12 px-6">
         <div class="max-w-7xl mx-auto">
             <!-- Hero Section -->
-            <div class="text-center mb-12">
+            <div id="heroSection" class="text-center mb-12">
                 <h2 class="font-display text-4xl md:text-5xl font-black text-[var(--text-primary)] mb-4">
                     Meet Your Smart Farm Companion
                 </h2>
@@ -853,7 +1150,7 @@
             </div>
             
             <!-- Main Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div id="mainGridMobile" class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <!-- Left Side: Robot -->
                 <div>
                     <!-- Robot Container -->
@@ -867,7 +1164,7 @@
                 </div>
 
                 <!-- Right Side: Chat Interface -->
-                <div class="chat-container h-[600px]">
+                <div class="chat-container h-[600px]" id="chatSection">
                     <div class="chat-header">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center shadow-lg shadow-[var(--shadow-color)]">
@@ -1126,10 +1423,27 @@
         let ttsEnabled = true;
         
         // Backend API
-        const API_BASE_URL = (
-            window.localStorage.getItem('AGROBOT_API_BASE_URL') ||
-            (window.location.port === '5500' ? 'http://127.0.0.1:5000' : window.location.origin)
-        ).replace(/\/$/, '');
+        function resolveApiBaseUrl() {
+            const saved = (window.localStorage.getItem('AGROBOT_API_BASE_URL') || '').trim();
+            if (saved) return saved.replace(/\/$/, '');
+
+            const queryValue = new URLSearchParams(window.location.search).get('api_base');
+            if (queryValue && queryValue.trim()) {
+                return queryValue.trim().replace(/\/$/, '');
+            }
+
+            if (window.location.protocol === 'file:') {
+                return 'http://127.0.0.1:5000';
+            }
+
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return 'http://127.0.0.1:5000';
+            }
+
+            return window.location.origin.replace(/\/$/, '');
+        }
+
+        const API_BASE_URL = resolveApiBaseUrl();
         const CHAT_API_URL = API_BASE_URL + '/api/chat';
         const SENSOR_API_URL = API_BASE_URL + '/data';
         
@@ -1269,7 +1583,13 @@
             } catch (error) {
                 hideTyping();
                 console.error('Fetch Error:', error);
-                addMessage(`I'm having trouble reaching the server: ${error.message}`);
+                const mixedContentBlocked =
+                    window.location.protocol === 'https:' &&
+                    CHAT_API_URL.startsWith('http://');
+                const guidance = mixedContentBlocked
+                    ? 'This page is HTTPS but your API is HTTP. Use an HTTPS backend URL.'
+                    : `Set backend URL with localStorage.setItem('AGROBOT_API_BASE_URL','https://your-backend-domain') and refresh.`;
+                addMessage(`I'm having trouble reaching the server: ${error.message}. ${guidance}`);
             }
         }
         chatForm.addEventListener('submit', (e) => {
@@ -1299,7 +1619,10 @@
         
         // Voice Recognition
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
+        const speechRecognitionSupported = Boolean(SpeechRecognition);
+        let startNavVoiceCommand = null;
+
+        if (speechRecognitionSupported) {
             const recognition = new SpeechRecognition();
             recognition.continuous = false;
             
@@ -1325,6 +1648,36 @@
                 chatInput.value = transcript;
                 handleQuestion(transcript);
                 chatInput.value = '';
+            };
+
+            const navRecognition = new SpeechRecognition();
+            navRecognition.continuous = false;
+            navRecognition.interimResults = false;
+
+            startNavVoiceCommand = () => {
+                if (!mobileCommandBtn) return;
+                if (mobileCommandBtn.classList.contains('listening')) {
+                    navRecognition.stop();
+                    return;
+                }
+                navRecognition.lang = langSelect.value || 'en-US';
+                navRecognition.start();
+            };
+
+            navRecognition.onstart = () => {
+                if (mobileCommandBtn) mobileCommandBtn.classList.add('listening');
+            };
+
+            navRecognition.onend = () => {
+                if (mobileCommandBtn) mobileCommandBtn.classList.remove('listening');
+            };
+
+            navRecognition.onresult = (event) => {
+                const transcript = (event.results?.[0]?.[0]?.transcript || '').trim();
+                const ok = navigateByCommand(transcript);
+                if (!ok) {
+                    addMessage('Command not recognized. Say: weather, dashboard, chat, irrigation, or home.');
+                }
             };
         } else {
             voiceBtn.style.display = 'none';
@@ -1361,8 +1714,10 @@
         // Weather toggle
         const dashboardToggle = document.getElementById('dashboardToggle');
         const weatherToggle = document.getElementById('weatherToggle');
+        const mobileCommandBtn = document.getElementById('mobileCommandBtn');
         const weatherPanel = document.getElementById('weatherPanel');
         const dashboardSection = document.getElementById('dashboardSection');
+        const chatSection = document.getElementById('chatSection');
         const weatherTemp = document.getElementById('weatherTemp');
         const weatherCondition = document.getElementById('weatherCondition');
         const weatherLocation = document.getElementById('weatherLocation');
@@ -1508,42 +1863,81 @@
             });
         }
 
+        function createPositionLike(lat, lon) {
+            return { coords: { latitude: Number(lat), longitude: Number(lon) } };
+        }
+
+        async function getIpBasedPosition() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                if (!res.ok) return null;
+                const data = await res.json();
+                if (!Number.isFinite(Number(data.latitude)) || !Number.isFinite(Number(data.longitude))) {
+                    return null;
+                }
+                return createPositionLike(data.latitude, data.longitude);
+            } catch {
+                return null;
+            }
+        }
+
+        let cachedPosition = null;
+        const defaultWeatherPosition = createPositionLike(17.3850, 78.4867); // Hyderabad fallback
+
+        async function requestLocationPermissionOnOpen() {
+            try {
+                const position = await getCurrentPosition();
+                cachedPosition = position;
+                return position;
+            } catch {
+                const ipPosition = await getIpBasedPosition();
+                if (ipPosition) {
+                    cachedPosition = ipPosition;
+                    weatherUpdated.textContent = "Using approximate location";
+                    return ipPosition;
+                }
+                cachedPosition = defaultWeatherPosition;
+                weatherUpdated.textContent = "Using default location";
+                return defaultWeatherPosition;
+            }
+        }
+
         async function fetchPreciseWeather() {
             weatherUpdated.textContent = "Updating...";
             try {
-                const position = await getCurrentPosition();
+                const position = cachedPosition || (await requestLocationPermissionOnOpen());
+                cachedPosition = position;
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
 
-                const weatherRes = await fetch(
-                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,precipitation_probability_max&timezone=auto&forecast_days=5`
-                );
+                const weatherRes = await fetch(`${API_BASE_URL}/api/weather?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`);
                 if (!weatherRes.ok) throw new Error(`Weather API ${weatherRes.status}`);
                 const weather = await weatherRes.json();
+                if (weather?.error) throw new Error(weather.error);
 
                 const current = weather.current || {};
-                const daily = weather.daily || {};
-                const code = Number(current.weather_code ?? 0);
-                const label = weatherLabel(code);
+                const daily = Array.isArray(weather.daily) ? weather.daily : [];
+                const label = current.condition || "Weather update";
+                const tempValue = Number(current.temperature_c ?? current.temperature_2m ?? 0);
+                const humidityValue = Number(current.humidity_pct ?? current.relative_humidity_2m ?? 0);
+                const windValue = Number(current.wind_kmh ?? current.wind_speed_10m ?? 0);
+                const sourceLabel = weather.source === 'openweather' ? 'OpenWeather' : 'Open-Meteo';
 
-                weatherTemp.textContent = `${Math.round(Number(current.temperature_2m ?? 0))}C`;
+                weatherTemp.textContent = `${Math.round(tempValue)}C`;
                 weatherCondition.textContent = label;
-                weatherHumidity.textContent = `${Math.round(Number(current.relative_humidity_2m ?? 0))}%`;
-                weatherWind.textContent = `${Math.round(Number(current.wind_speed_10m ?? 0))} km/h`;
-                const rainNow = Array.isArray(daily.precipitation_probability_max) ? Number(daily.precipitation_probability_max[0] ?? 0) : 0;
+                weatherHumidity.textContent = `${Math.round(humidityValue)}%`;
+                weatherWind.textContent = `${Math.round(windValue)} km/h`;
+                const rainNow = daily.length ? Number(daily[0].rain_chance_pct ?? 0) : 0;
                 weatherRain.textContent = `${Math.round(rainNow)}%`;
                 weatherLocation.textContent = await reverseGeocode(lat, lon);
-                weatherUpdated.textContent = "Live";
+                weatherUpdated.textContent = `Live ${sourceLabel}`;
 
-                const times = daily.time || [];
-                const codes = daily.weather_code || [];
-                const maxTemps = daily.temperature_2m_max || [];
-                weatherDaily.innerHTML = times.slice(0, 5).map((day, i) => {
-                    const dayCode = Number(codes[i] ?? 0);
+                weatherDaily.innerHTML = daily.slice(0, 5).map((item) => {
+                    const day = item.date || '';
                     const dayLabelText = dayLabel(day);
-                    const dayCondition = weatherLabel(dayCode);
+                    const dayCondition = item.condition || "Weather update";
                     const icon = weatherIcon(dayCondition);
-                    const temp = `${Math.round(Number(maxTemps[i] ?? 0))}C`;
+                    const temp = `${Math.round(Number(item.temp_max_c ?? 0))}C`;
                     return `
                         <div class="text-center">
                             <div class="text-xs text-text-secondary">${dayLabelText}</div>
@@ -1554,10 +1948,48 @@
                 }).join("");
             } catch (error) {
                 weatherUpdated.textContent = "Unavailable";
-                weatherCondition.textContent = "Location permission needed";
-                weatherLocation.textContent = "Enable location for precise forecast";
+                weatherCondition.textContent = "Weather fetch failed";
+                weatherLocation.textContent = "Check internet and try again";
                 console.error("Weather Error:", error);
             }
+        }
+
+        function navigateByCommand(commandText) {
+            const command = String(commandText || '').toLowerCase().trim();
+            if (!command) return false;
+
+            if (command.includes('weather') || command.includes('forecast') || command.includes('rain')) {
+                weatherPanel.classList.add('active');
+                fetchPreciseWeather();
+                return true;
+            }
+
+            if (command.includes('dash') || command.includes('soil') || command.includes('field')) {
+                weatherPanel.classList.remove('active');
+                dashboardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return true;
+            }
+
+            if (command.includes('chat') || command.includes('ask') || command.includes('bot')) {
+                weatherPanel.classList.remove('active');
+                chatSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setTimeout(() => chatInput.focus(), 350);
+                return true;
+            }
+
+            if (command.includes('irrigation') || command.includes('valve') || command.includes('water')) {
+                weatherPanel.classList.remove('active');
+                irrigationControl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return true;
+            }
+
+            if (command.includes('home') || command.includes('top') || command.includes('start')) {
+                weatherPanel.classList.remove('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return true;
+            }
+
+            return false;
         }
         
         dashboardToggle.addEventListener('click', () => {
@@ -1608,6 +2040,27 @@
                 fetchPreciseWeather();
             }
         });
+
+        if (!speechRecognitionSupported && mobileCommandBtn) {
+            mobileCommandBtn.style.display = 'none';
+        }
+
+        if (mobileCommandBtn) {
+            mobileCommandBtn.addEventListener('click', () => {
+                if (startNavVoiceCommand) {
+                    startNavVoiceCommand();
+                } else {
+                    const command = window.prompt(
+                        'Navigation command: weather, dashboard, chat, irrigation, home'
+                    );
+                    if (command === null) return;
+                    const ok = navigateByCommand(command);
+                    if (!ok) {
+                        addMessage('Command not recognized. Try: weather, dashboard, chat, irrigation, or home.');
+                    }
+                }
+            });
+        }
         
         // Close weather panel when clicking outside
         document.addEventListener('click', (e) => {
@@ -1616,7 +2069,7 @@
             }
         });
 
-        fetchPreciseWeather();
+        requestLocationPermissionOnOpen().finally(() => fetchPreciseWeather());
         setInterval(fetchPreciseWeather, 15 * 60 * 1000);
         
         // Live soil data (sensor-backed with simulation fallback)

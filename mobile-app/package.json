@@ -13,6 +13,7 @@
     "@react-native-voice/voice": "^3.2.4",
     "expo": "~53.0.0",
     "expo-device": "~7.0.3",
+    "expo-location": "~18.1.4",
     "expo-notifications": "~0.31.4",
     "expo-speech": "~13.0.1",
     "expo-status-bar": "~2.2.3",
