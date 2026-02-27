@@ -253,8 +253,17 @@ def _extract_sensor_payload() -> dict | None:
     return None
 
 
+@app.route('/update-moisture', methods=['POST'])
+def update_moisture():
+    global sensor_data
+    moisture = request.form.get('moisture')
+    if moisture:
+        sensor_data["moisture"] = moisture
+        print(f"Moisture received: {moisture}%")
+    return "OK", 200
+
+
 @app.post("/update")
-@app.post("/update-moisture")
 def update_data():
     global sensor_data
 
