@@ -469,6 +469,38 @@ def _save_alert_event(alert: dict, crop_type: str, sensor_snapshot: dict, weathe
     )
 
 
+def _save_sensor_reading(sensor_snapshot: dict, raw_payload: dict | None = None) -> tuple[bool, str]:
+    db = _firestore_client()
+    if db is None:
+        return False, "Firestore is not configured."
+
+    now = datetime.utcnow()
+    payload = {
+        "moisture": _to_float(sensor_snapshot.get("moisture")),
+        "ph": _to_float(sensor_snapshot.get("ph")),
+        "temp": _to_float(sensor_snapshot.get("temp")),
+        "nitrogen": _to_float(sensor_snapshot.get("nitrogen")),
+        "phosphorus": _to_float(sensor_snapshot.get("phosphorus")),
+        "potassium": _to_float(sensor_snapshot.get("potassium")),
+        "latitude": _to_float(sensor_snapshot.get("latitude")),
+        "longitude": _to_float(sensor_snapshot.get("longitude")),
+        "source": "update-endpoint",
+        "created_at": now.strftime("%Y-%m-%d %H:%M:%S"),
+        "created_at_epoch": now.timestamp(),
+    }
+
+    if isinstance(raw_payload, dict):
+        relay = raw_payload.get("relay")
+        if relay is not None and str(relay).strip() != "":
+            payload["relay"] = str(relay).strip()
+
+    try:
+        db.collection("sensor_readings").add(payload)
+        return True, ""
+    except Exception as exc:  # noqa: BLE001
+        return False, str(exc)
+
+
 def _alert_history(limit: int = 50) -> list[dict]:
     safe_limit = max(1, min(limit, 200))
     db = _firestore_client()
@@ -613,9 +645,19 @@ def _firebase_ready() -> tuple[bool, str]:
         return False, "firebase-admin is not installed on server."
 
     service_account_file = os.getenv("FIREBASE_SERVICE_ACCOUNT_FILE", "").strip()
+    service_account_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip()
     project_id = os.getenv("FIREBASE_PROJECT_ID", "agrisens-fca57").strip() or "agrisens-fca57"
     if not firebase_admin._apps:  # type: ignore[attr-defined]
-        if service_account_file:
+        if service_account_json:
+            try:
+                parsed_credentials = json.loads(service_account_json)
+                if not isinstance(parsed_credentials, dict):
+                    return False, "FIREBASE_SERVICE_ACCOUNT_JSON is not a valid JSON object."
+            except Exception as exc:  # noqa: BLE001
+                return False, f"Unable to parse FIREBASE_SERVICE_ACCOUNT_JSON: {exc}"
+            cred = credentials.Certificate(parsed_credentials)
+            firebase_admin.initialize_app(cred, {"projectId": project_id})
+        elif service_account_file:
             service_account_path = Path(service_account_file)
             if not service_account_path.is_absolute():
                 service_account_path = BASE_DIR / service_account_file
@@ -631,8 +673,9 @@ def _firebase_ready() -> tuple[bool, str]:
                 default_path = BASE_DIR / "firebase-service-account.json"
                 return (
                     False,
-                    "FIREBASE_SERVICE_ACCOUNT_FILE is not configured and ADC is unavailable. "
-                    f"Set FIREBASE_SERVICE_ACCOUNT_FILE (for example: {default_path}).",
+                    "Firebase credentials are not configured and ADC is unavailable. "
+                    "Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_SERVICE_ACCOUNT_FILE "
+                    f"(for example: {default_path}).",
                 )
     return True, ""
 
@@ -1045,7 +1088,13 @@ messaging.onBackgroundMessage((payload) => {{
 def _authorize_sensor_client() -> tuple[bool, object | None]:
     expected_token = os.getenv("SENSOR_API_TOKEN", "").strip()
     if expected_token:
-        provided_token = request.headers.get("X-Sensor-Token", "").strip()
+        provided_token = (
+            request.headers.get("X-Sensor-Token", "").strip()
+            or request.headers.get("Authorization", "").replace("Bearer", "").strip()
+            or str(request.args.get("sensor_token") or "").strip()
+            or str(request.form.get("sensor_token") or "").strip()
+            or str((request.get_json(silent=True) or {}).get("sensor_token") or "").strip()
+        )
         if provided_token != expected_token:
             return False, (jsonify({"error": "Unauthorized sensor client"}), 401)
     return True, None
@@ -1066,6 +1115,16 @@ def _extract_sensor_payload() -> dict | None:
     if form_payload:
         return form_payload
 
+    # Simple fallback for ESP/URL-based sends:
+    # /update?moisture=70&temp=29&sensor_token=...
+    query_payload: dict[str, object] = {}
+    for key in ("moisture", "ph", "temp", "nitrogen", "phosphorus", "potassium", "latitude", "longitude"):
+        value = request.args.get(key)
+        if value is not None and str(value).strip() != "":
+            query_payload[key] = value
+    if query_payload:
+        return query_payload
+
     return None
 
 
@@ -1079,7 +1138,7 @@ def update_moisture():
     return "OK", 200
 
 
-@app.post("/update")
+@app.route("/update", methods=["GET", "POST"])
 def update_data():
     global sensor_data
 
@@ -1089,7 +1148,7 @@ def update_data():
 
     payload = _extract_sensor_payload()
     if not isinstance(payload, dict):
-        return jsonify({"error": "Invalid payload. Send JSON or form data."}), 400
+        return jsonify({"error": "Invalid payload. Send JSON, form data, or query params."}), 400
 
     def _pick_numeric(field: str, fallback: float) -> float:
         parsed = _to_float(payload.get(field, fallback))
@@ -1117,6 +1176,7 @@ def update_data():
 
     sensor_data = merged
     _append_sensor_reading(sensor_data)
+    firestore_saved, firestore_error = _save_sensor_reading(sensor_data, payload)
     engine_result = None
     with _alert_engine_lock:
         engine_result = _run_alert_engine_if_due(force=False)
@@ -1125,6 +1185,8 @@ def update_data():
         {
             "status": "Data received successfully",
             "data": sensor_data,
+            "firestore_saved": firestore_saved,
+            "firestore_error": firestore_error,
             "alert_engine_ran": engine_result is not None,
             "new_alerts": (engine_result or {}).get("new_alerts", []),
         }

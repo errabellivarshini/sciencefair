@@ -8,3 +8,5 @@ __pycache__/
 node_modules/
 dist/
 build/
+firebase-service-account.json
+*firebase-adminsdk-*.json
