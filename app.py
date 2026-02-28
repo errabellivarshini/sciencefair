@@ -787,22 +787,40 @@ def _save_profile(payload: dict) -> dict:
 
 
 def _load_local_profiles() -> list[dict]:
-    if not FARM_PROFILES_PATH.exists():
-        return []
-    try:
-        payload = json.loads(FARM_PROFILES_PATH.read_text(encoding="utf-8"))
-        if not isinstance(payload, list):
-            return []
-        rows = [item for item in payload if isinstance(item, dict)]
-        rows.sort(key=lambda row: _to_float(row.get("created_at_epoch")) or 0.0, reverse=True)
-        return rows
-    except Exception:  # noqa: BLE001
-        return []
+    candidates = [FARM_PROFILES_PATH]
+    tmp_profiles_path = Path(os.getenv("FARM_PROFILES_TMP_PATH", "/tmp/farm_profiles.json")).resolve()
+    if tmp_profiles_path not in candidates:
+        candidates.append(tmp_profiles_path)
+
+    for path in candidates:
+        if not path.exists():
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(payload, list):
+                continue
+            rows = [item for item in payload if isinstance(item, dict)]
+            rows.sort(key=lambda row: _to_float(row.get("created_at_epoch")) or 0.0, reverse=True)
+            return rows
+        except Exception:  # noqa: BLE001
+            continue
+    return []
 
 
 def _save_local_profiles(rows: list[dict]) -> None:
-    FARM_PROFILES_PATH.parent.mkdir(parents=True, exist_ok=True)
-    FARM_PROFILES_PATH.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+    serialized = json.dumps(rows, indent=2)
+    targets = [FARM_PROFILES_PATH, Path(os.getenv("FARM_PROFILES_TMP_PATH", "/tmp/farm_profiles.json")).resolve()]
+    last_error: Exception | None = None
+    for path in targets:
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(serialized, encoding="utf-8")
+            return
+        except Exception as exc:  # noqa: BLE001
+            last_error = exc
+            continue
+    if last_error is not None:
+        raise last_error
 
 
 def _save_local_profile(profile: dict) -> dict:
