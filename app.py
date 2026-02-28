@@ -1157,17 +1157,7 @@ messaging.onBackgroundMessage((payload) => {{
 
 
 def _authorize_sensor_client() -> tuple[bool, object | None]:
-    expected_token = os.getenv("SENSOR_API_TOKEN", "").strip()
-    if expected_token:
-        provided_token = (
-            request.headers.get("X-Sensor-Token", "").strip()
-            or request.headers.get("Authorization", "").replace("Bearer", "").strip()
-            or str(request.args.get("sensor_token") or "").strip()
-            or str(request.form.get("sensor_token") or "").strip()
-            or str((request.get_json(silent=True) or {}).get("sensor_token") or "").strip()
-        )
-        if provided_token != expected_token:
-            return False, (jsonify({"error": "Unauthorized sensor client"}), 401)
+    # Sensor token auth intentionally disabled per current deployment requirement.
     return True, None
 
 
