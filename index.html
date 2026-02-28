@@ -2211,6 +2211,7 @@
         const moistureRawValue = document.getElementById('moistureRawValue');
         let liveMoisture = 72;
         let sensorOnline = false;
+        let lastSensorEpoch = 0;
         const soilProfiles = {
             sandy: { min: 10, max: 25, drainageKey: "drainage_fast" },
             loamy: { min: 20, max: 35, drainageKey: "drainage_balanced" },
@@ -2712,18 +2713,25 @@
         requestLocationPermissionOnOpen().finally(() => fetchPreciseWeather());
         setInterval(fetchPreciseWeather, 15 * 60 * 1000);
         
-        // Live soil data (sensor-backed with simulation fallback)
-        function updateSoilDataSimulated() {
-            const moisture = 68 + Math.random() * 8;
-            const ph = 6.5 + Math.random() * 0.5;
-            const temp = 22 + Math.random() * 4;
-            const nitrogen = 50 + Math.random() * 10;
-            const moistureRaw = 3200 - (moisture / 100) * (3200 - 1400);
-            applySoilData({ moisture, moisture_raw: moistureRaw, ph, temp, nitrogen }, false);
+        // Live soil data (sensor-backed; keep last value if feed is unavailable)
+        function _extractEpoch(data) {
+            const direct = Number(data?.updated_at_epoch);
+            if (Number.isFinite(direct) && direct > 0) return direct;
+            const text = String(data?.updated_at || '');
+            if (!text) return 0;
+            const parsed = new Date(text.replace(' ', 'T') + 'Z').getTime() / 1000;
+            return Number.isFinite(parsed) ? parsed : 0;
         }
 
         function applySoilData(data, fromSensor = true) {
-            const moisture = Number(data.moisture ?? 70);
+            const incomingEpoch = _extractEpoch(data);
+            if (incomingEpoch && incomingEpoch < lastSensorEpoch) {
+                return;
+            }
+            if (incomingEpoch) {
+                lastSensorEpoch = incomingEpoch;
+            }
+            const moisture = Number(data.moisture ?? data.moisture_percent ?? 70);
             const moistureRaw = Number(data.moisture_raw ?? (moisture > 100 ? moisture : NaN));
             const hasMoistureRaw = Number.isFinite(moistureRaw);
             const ph = Number(data.ph ?? 6.8);
@@ -2732,10 +2740,11 @@
             liveMoisture = moisture;
             sensorOnline = fromSensor;
 
-            document.getElementById('moistureValue').textContent = moisture.toFixed(0) + '%';
-            document.getElementById('moistureRadial').style.setProperty('--value', moisture.toFixed(0));
+            const safeMoisture = Number.isFinite(moisture) ? Math.max(0, Math.min(100, moisture)) : 0;
+            document.getElementById('moistureValue').textContent = safeMoisture.toFixed(1) + '%';
+            document.getElementById('moistureRadial').style.setProperty('--value', safeMoisture.toFixed(1));
             if (moistureRawValue) {
-                moistureRawValue.textContent = hasMoistureRaw ? `Raw: ${Math.round(moistureRaw)}` : 'Raw: --';
+                moistureRawValue.textContent = hasMoistureRaw ? `Raw: ${moistureRaw}` : 'Raw: --';
             }
 
             document.getElementById('phValue').textContent = ph.toFixed(1);
@@ -2758,12 +2767,12 @@
                 applySoilData(payload || {});
             } catch (error) {
                 sensorOnline = false;
-                updateSoilDataSimulated();
+                updateIrrigationUI();
             }
         }
 
         updateSoilData();
-        setInterval(updateSoilData, 5000);
+        setInterval(updateSoilData, 1200);
         fetchAlertsPanel();
         setInterval(fetchAlertsPanel, 5 * 1000);
         // Floating particles

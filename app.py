@@ -1214,7 +1214,7 @@ def _extract_sensor_payload() -> dict | None:
 
     # ESP32 often sends x-www-form-urlencoded or multipart form-data.
     form_payload: dict[str, object] = {}
-    for key in ("moisture", "moisture_raw", "ph", "temp", "nitrogen", "phosphorus", "potassium", "latitude", "longitude"):
+    for key in ("moisture", "moisture_percent", "moisture_raw", "ph", "temp", "nitrogen", "phosphorus", "potassium", "latitude", "longitude"):
         value = request.form.get(key)
         if value is not None and str(value).strip() != "":
             form_payload[key] = value
@@ -1224,7 +1224,7 @@ def _extract_sensor_payload() -> dict | None:
     # Simple fallback for ESP/URL-based sends:
     # /update?moisture=70&temp=29&sensor_token=...
     query_payload: dict[str, object] = {}
-    for key in ("moisture", "moisture_raw", "ph", "temp", "nitrogen", "phosphorus", "potassium", "latitude", "longitude"):
+    for key in ("moisture", "moisture_percent", "moisture_raw", "ph", "temp", "nitrogen", "phosphorus", "potassium", "latitude", "longitude"):
         value = request.args.get(key)
         if value is not None and str(value).strip() != "":
             query_payload[key] = value
@@ -1273,11 +1273,18 @@ def update_data():
     existing_moisture = _to_float(sensor_data.get("moisture")) or 0.0
     existing_moisture_raw = _to_float(sensor_data.get("moisture_raw"))
     incoming_moisture = _to_float(payload.get("moisture"))
+    incoming_moisture_percent = _to_float(payload.get("moisture_percent"))
     incoming_moisture_raw = _to_float(payload.get("moisture_raw"))
 
     moisture_percent = existing_moisture
     moisture_raw = existing_moisture_raw
-    if incoming_moisture_raw is not None:
+    if incoming_moisture_percent is not None:
+        moisture_percent = max(0.0, min(100.0, incoming_moisture_percent))
+        if incoming_moisture_raw is not None:
+            moisture_raw = incoming_moisture_raw
+        elif incoming_moisture is not None and incoming_moisture > 100:
+            moisture_raw = incoming_moisture
+    elif incoming_moisture_raw is not None:
         moisture_raw = incoming_moisture_raw
         moisture_percent = _raw_to_moisture_percent(incoming_moisture_raw)
     elif incoming_moisture is not None:
@@ -1289,6 +1296,7 @@ def update_data():
 
     merged = {
         "moisture": moisture_percent,
+        "moisture_percent": moisture_percent,
         "ph": _pick_numeric("ph", _to_float(sensor_data.get("ph")) or 7.0),
         "temp": _pick_numeric("temp", _to_float(sensor_data.get("temp")) or 25.0),
         "nitrogen": _pick_numeric("nitrogen", _to_float(sensor_data.get("nitrogen")) or 50.0),
@@ -1297,6 +1305,9 @@ def update_data():
     }
     if moisture_raw is not None:
         merged["moisture_raw"] = moisture_raw
+    now = datetime.utcnow()
+    merged["updated_at"] = now.strftime("%Y-%m-%d %H:%M:%S")
+    merged["updated_at_epoch"] = now.timestamp()
 
     lat = _to_float(payload.get("latitude"))
     lon = _to_float(payload.get("longitude"))
