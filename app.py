@@ -770,11 +770,19 @@ def _save_profile(payload: dict) -> dict:
     }
     db = _firestore_client()
     if db is None:
+        profile["storage_mode"] = "local-fallback"
         return _save_local_profile(profile)
-    ref = db.collection("farm_profiles").document()
-    profile["id"] = ref.id
-    ref.set(profile)
-    return profile
+    try:
+        ref = db.collection("farm_profiles").document()
+        profile["id"] = ref.id
+        profile["storage_mode"] = "firestore"
+        ref.set(profile)
+        return profile
+    except Exception:
+        # If Firestore write fails (rules/permissions/network), keep onboarding functional.
+        profile["id"] = profile.get("id") or str(int(time.time() * 1000))
+        profile["storage_mode"] = "local-fallback"
+        return _save_local_profile(profile)
 
 
 def _load_local_profiles() -> list[dict]:
@@ -961,8 +969,8 @@ def onboarding_submit():
     }
     try:
         saved = _save_profile(payload)
-    except Exception:  # noqa: BLE001
-        return jsonify({"error": "Failed to save onboarding profile."}), 500
+    except Exception as exc:  # noqa: BLE001
+        return jsonify({"error": f"Failed to save onboarding profile: {exc}"}), 500
     return jsonify({"message": "Onboarding saved", "profile": saved})
 
 
