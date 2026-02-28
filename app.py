@@ -478,6 +478,7 @@ def _save_sensor_reading(sensor_snapshot: dict, raw_payload: dict | None = None)
     now = datetime.utcnow()
     payload = {
         "moisture": _to_float(sensor_snapshot.get("moisture")),
+        "moisture_raw": _to_float(sensor_snapshot.get("moisture_raw")),
         "ph": _to_float(sensor_snapshot.get("ph")),
         "temp": _to_float(sensor_snapshot.get("temp")),
         "nitrogen": _to_float(sensor_snapshot.get("nitrogen")),
@@ -884,6 +885,9 @@ def _bootstrap_background_services():
 
 @app.get("/")
 def index():
+    force_new = str(request.args.get("new") or "").strip().lower() in {"1", "true", "yes"}
+    if force_new:
+        return send_from_directory(BASE_DIR, "onboarding.html")
     _init_db()
     if _latest_profile() is None:
         return send_from_directory(BASE_DIR, "onboarding.html")
@@ -892,6 +896,9 @@ def index():
 
 @app.get("/dashboard")
 def dashboard_alias():
+    force_new = str(request.args.get("new") or "").strip().lower() in {"1", "true", "yes"}
+    if force_new:
+        return send_from_directory(BASE_DIR, "onboarding.html")
     _init_db()
     if _latest_profile() is None:
         return send_from_directory(BASE_DIR, "onboarding.html")
@@ -900,6 +907,12 @@ def dashboard_alias():
 
 @app.get("/onboarding")
 def onboarding_page():
+    _init_db()
+    return send_from_directory(BASE_DIR, "onboarding.html")
+
+
+@app.get("/signup")
+def signup_page():
     _init_db()
     return send_from_directory(BASE_DIR, "onboarding.html")
 
@@ -1148,7 +1161,7 @@ def _extract_sensor_payload() -> dict | None:
 
     # ESP32 often sends x-www-form-urlencoded or multipart form-data.
     form_payload: dict[str, object] = {}
-    for key in ("moisture", "ph", "temp", "nitrogen", "phosphorus", "potassium", "latitude", "longitude"):
+    for key in ("moisture", "moisture_raw", "ph", "temp", "nitrogen", "phosphorus", "potassium", "latitude", "longitude"):
         value = request.form.get(key)
         if value is not None and str(value).strip() != "":
             form_payload[key] = value
@@ -1158,7 +1171,7 @@ def _extract_sensor_payload() -> dict | None:
     # Simple fallback for ESP/URL-based sends:
     # /update?moisture=70&temp=29&sensor_token=...
     query_payload: dict[str, object] = {}
-    for key in ("moisture", "ph", "temp", "nitrogen", "phosphorus", "potassium", "latitude", "longitude"):
+    for key in ("moisture", "moisture_raw", "ph", "temp", "nitrogen", "phosphorus", "potassium", "latitude", "longitude"):
         value = request.args.get(key)
         if value is not None and str(value).strip() != "":
             query_payload[key] = value
@@ -1166,6 +1179,16 @@ def _extract_sensor_payload() -> dict | None:
         return query_payload
 
     return None
+
+
+def _raw_to_moisture_percent(raw_value: float) -> float:
+    dry = _to_float(os.getenv("MOISTURE_RAW_DRY", "3200")) or 3200.0
+    wet = _to_float(os.getenv("MOISTURE_RAW_WET", "1400")) or 1400.0
+    if dry == wet:
+        dry = 3200.0
+        wet = 1400.0
+    percent = ((raw_value - dry) / (wet - dry)) * 100.0
+    return max(0.0, min(100.0, percent))
 
 
 @app.route('/update-moisture', methods=['POST'])
@@ -1194,14 +1217,33 @@ def update_data():
         parsed = _to_float(payload.get(field, fallback))
         return fallback if parsed is None else parsed
 
+    existing_moisture = _to_float(sensor_data.get("moisture")) or 0.0
+    existing_moisture_raw = _to_float(sensor_data.get("moisture_raw"))
+    incoming_moisture = _to_float(payload.get("moisture"))
+    incoming_moisture_raw = _to_float(payload.get("moisture_raw"))
+
+    moisture_percent = existing_moisture
+    moisture_raw = existing_moisture_raw
+    if incoming_moisture_raw is not None:
+        moisture_raw = incoming_moisture_raw
+        moisture_percent = _raw_to_moisture_percent(incoming_moisture_raw)
+    elif incoming_moisture is not None:
+        if incoming_moisture > 100:
+            moisture_raw = incoming_moisture
+            moisture_percent = _raw_to_moisture_percent(incoming_moisture)
+        else:
+            moisture_percent = incoming_moisture
+
     merged = {
-        "moisture": _pick_numeric("moisture", _to_float(sensor_data.get("moisture")) or 0.0),
+        "moisture": moisture_percent,
         "ph": _pick_numeric("ph", _to_float(sensor_data.get("ph")) or 7.0),
         "temp": _pick_numeric("temp", _to_float(sensor_data.get("temp")) or 25.0),
         "nitrogen": _pick_numeric("nitrogen", _to_float(sensor_data.get("nitrogen")) or 50.0),
         "phosphorus": _pick_numeric("phosphorus", _to_float(sensor_data.get("phosphorus")) or 25.0),
         "potassium": _pick_numeric("potassium", _to_float(sensor_data.get("potassium")) or 30.0),
     }
+    if moisture_raw is not None:
+        merged["moisture_raw"] = moisture_raw
 
     lat = _to_float(payload.get("latitude"))
     lon = _to_float(payload.get("longitude"))

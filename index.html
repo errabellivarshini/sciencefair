@@ -1325,7 +1325,7 @@
                         <path d="M16 17l5-5-5-5"></path>
                         <path d="M21 12H9"></path>
                     </svg>
-                    <span class="hidden sm:inline">Logout</span>
+                    <span class="hidden sm:inline">New Signup</span>
                 </button>
                 <div class="status-badge status-online">
                     <span class="indicator-dot bg-[var(--accent-primary)]"></span>
@@ -1529,6 +1529,7 @@
                             <div>
                                 <div class="text-sm font-semibold text-text-primary" data-i18n="label_moisture">Moisture</div>
                                 <div class="text-xs text-text-secondary" data-i18n="label_optimal_level">Optimal Level</div>
+                                <div id="moistureRawValue" class="text-xs text-text-secondary">Raw: --</div>
                             </div>
                         </div>
                         <!-- Soil pH -->
@@ -2207,6 +2208,7 @@
         const activeAlerts = document.getElementById('activeAlerts');
         const predictiveWarning = document.getElementById('predictiveWarning');
         const alertHistoryList = document.getElementById('alertHistoryList');
+        const moistureRawValue = document.getElementById('moistureRawValue');
         let liveMoisture = 72;
         let sensorOnline = false;
         const soilProfiles = {
@@ -2633,9 +2635,7 @@
         }
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
-                window.localStorage.removeItem(LANGUAGE_STORAGE_KEY);
-                window.localStorage.removeItem('AGROBOT_API_BASE_URL');
-                window.location.href = '/onboarding';
+                window.location.href = '/signup?new=1';
             });
         }
 
@@ -2718,11 +2718,14 @@
             const ph = 6.5 + Math.random() * 0.5;
             const temp = 22 + Math.random() * 4;
             const nitrogen = 50 + Math.random() * 10;
-            applySoilData({ moisture, ph, temp, nitrogen }, false);
+            const moistureRaw = 3200 - (moisture / 100) * (3200 - 1400);
+            applySoilData({ moisture, moisture_raw: moistureRaw, ph, temp, nitrogen }, false);
         }
 
         function applySoilData(data, fromSensor = true) {
             const moisture = Number(data.moisture ?? 70);
+            const moistureRaw = Number(data.moisture_raw ?? (moisture > 100 ? moisture : NaN));
+            const hasMoistureRaw = Number.isFinite(moistureRaw);
             const ph = Number(data.ph ?? 6.8);
             const temp = Number(data.temp ?? 24);
             const nitrogen = Number(data.nitrogen ?? 55);
@@ -2731,6 +2734,9 @@
 
             document.getElementById('moistureValue').textContent = moisture.toFixed(0) + '%';
             document.getElementById('moistureRadial').style.setProperty('--value', moisture.toFixed(0));
+            if (moistureRawValue) {
+                moistureRawValue.textContent = hasMoistureRaw ? `Raw: ${Math.round(moistureRaw)}` : 'Raw: --';
+            }
 
             document.getElementById('phValue').textContent = ph.toFixed(1);
             document.getElementById('phRadial').style.setProperty('--value', (ph / 14 * 100).toFixed(0));
