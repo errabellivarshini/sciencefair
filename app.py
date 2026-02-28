@@ -35,6 +35,7 @@ if not allowed_origins:
 CORS(app, resources={r"/*": {"origins": allowed_origins}})
 PUSH_TOKENS_PATH = BASE_DIR / "push_tokens.json"
 FARM_RECORDS_PATH = BASE_DIR / "data" / "farm_records.json"
+FARM_PROFILES_PATH = BASE_DIR / "data" / "farm_profiles.json"
 ALERT_THRESHOLDS_PATH = BASE_DIR / "data" / "crop_thresholds.json"
 ALERT_COOLDOWN_MINUTES = int(os.getenv("ALERT_COOLDOWN_MINUTES", "30").strip() or "30")
 ALERT_ENGINE_INTERVAL_SECONDS = int(os.getenv("ALERT_ENGINE_INTERVAL_SECONDS", "300").strip() or "300")
@@ -709,7 +710,8 @@ def _latest_profile() -> dict | None:
     try:
         db = _firestore_client()
         if db is None:
-            return None
+            rows = _load_local_profiles()
+            return rows[0] if rows else None
         docs = (
             db.collection("farm_profiles")
             .order_by("created_at_epoch", direction=firestore.Query.DESCENDING)
@@ -731,7 +733,7 @@ def _profile_records(limit: int = 25) -> list[dict]:
     try:
         db = _firestore_client()
         if db is None:
-            return []
+            return _load_local_profiles()[:safe_limit]
         docs = (
             db.collection("farm_profiles")
             .order_by("created_at_epoch", direction=firestore.Query.DESCENDING)
@@ -750,9 +752,6 @@ def _profile_records(limit: int = 25) -> list[dict]:
 
 
 def _save_profile(payload: dict) -> dict:
-    db = _firestore_client()
-    if db is None:
-        raise RuntimeError("Firestore is not configured.")
     now = datetime.utcnow()
     profile = {
         "language": str(payload.get("language") or "en-US").strip(),
@@ -763,13 +762,46 @@ def _save_profile(payload: dict) -> dict:
         "irrigation_method": str(payload.get("irrigation_method") or "").strip(),
         "water_availability": str(payload.get("water_availability") or "").strip(),
         "district_location": str(payload.get("district_location") or "").strip(),
+        "firebase_uid": str(payload.get("firebase_uid") or "").strip(),
+        "auth_source": str(payload.get("auth_source") or "").strip(),
         "created_at": now.strftime("%Y-%m-%d %H:%M:%S"),
         "updated_at": now.strftime("%Y-%m-%d %H:%M:%S"),
         "created_at_epoch": now.timestamp(),
     }
+    db = _firestore_client()
+    if db is None:
+        return _save_local_profile(profile)
     ref = db.collection("farm_profiles").document()
     profile["id"] = ref.id
     ref.set(profile)
+    return profile
+
+
+def _load_local_profiles() -> list[dict]:
+    if not FARM_PROFILES_PATH.exists():
+        return []
+    try:
+        payload = json.loads(FARM_PROFILES_PATH.read_text(encoding="utf-8"))
+        if not isinstance(payload, list):
+            return []
+        rows = [item for item in payload if isinstance(item, dict)]
+        rows.sort(key=lambda row: _to_float(row.get("created_at_epoch")) or 0.0, reverse=True)
+        return rows
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def _save_local_profiles(rows: list[dict]) -> None:
+    FARM_PROFILES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    FARM_PROFILES_PATH.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+
+
+def _save_local_profile(profile: dict) -> dict:
+    rows = _load_local_profiles()
+    local_id = str(int(time.time() * 1000))
+    profile["id"] = profile.get("id") or local_id
+    rows.insert(0, profile)
+    _save_local_profiles(rows)
     return profile
 
 
@@ -894,8 +926,6 @@ def farm_profile_records():
 
 @app.post("/api/onboarding")
 def onboarding_submit():
-    if not _init_db():
-        return jsonify({"error": "Database unavailable. Please try again later."}), 503
     body = request.get_json(silent=True) or {}
     required_fields = [
         "farmer_name",
@@ -926,6 +956,8 @@ def onboarding_submit():
         "irrigation_method": str(body.get("irrigation_method") or "").strip(),
         "water_availability": str(body.get("water_availability") or "").strip(),
         "district_location": str(body.get("district_location") or "").strip(),
+        "firebase_uid": str(body.get("firebase_uid") or "").strip(),
+        "auth_source": "firebase-anonymous" if str(body.get("firebase_uid") or "").strip() else "none",
     }
     try:
         saved = _save_profile(payload)

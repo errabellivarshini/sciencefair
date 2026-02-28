@@ -254,6 +254,49 @@
 </head>
 <body>
     <div id="root"></div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+        const authState = {
+            app: null,
+            auth: null,
+            uid: "",
+            idToken: "",
+            initialized: false
+        };
+
+        async function initFirebaseAuth() {
+            if (authState.initialized) return;
+            const configRes = await fetch("/api/push/config");
+            const payload = await configRes.json();
+            const cfg = (payload && payload.config) || {};
+            const required = ["apiKey", "authDomain", "projectId", "appId"];
+            const missing = required.filter((k) => !String(cfg[k] || "").trim());
+            if (missing.length) {
+                throw new Error(`Firebase config missing: ${missing.join(", ")}`);
+            }
+            authState.app = initializeApp({
+                apiKey: cfg.apiKey,
+                authDomain: cfg.authDomain,
+                projectId: cfg.projectId,
+                appId: cfg.appId,
+            });
+            authState.auth = getAuth(authState.app);
+            authState.initialized = true;
+        }
+
+        async function ensureAnonymousSignIn() {
+            await initFirebaseAuth();
+            const existing = authState.auth.currentUser;
+            const user = existing || (await signInAnonymously(authState.auth)).user;
+            authState.uid = user?.uid || "";
+            authState.idToken = authState.uid ? await user.getIdToken() : "";
+            return { uid: authState.uid, idToken: authState.idToken };
+        }
+
+        window.__agriFirebaseAuth = { ensureAnonymousSignIn };
+    </script>
     <script type="text/babel">
         const Motion = window["framer-motion"] || window.Motion || window.framerMotion || {};
         const motion = Motion.motion || new Proxy({}, { get: (_, tag) => tag });
@@ -518,9 +561,23 @@
                 setError("");
                 try {
                     const payload = { ...answers, language: lang };
+                    const headers = { "Content-Type": "application/json" };
+                    if (window.__agriFirebaseAuth?.ensureAnonymousSignIn) {
+                        try {
+                            const authCtx = await window.__agriFirebaseAuth.ensureAnonymousSignIn();
+                            if (authCtx?.uid) {
+                                payload.firebase_uid = authCtx.uid;
+                            }
+                            if (authCtx?.idToken) {
+                                headers["Authorization"] = `Bearer ${authCtx.idToken}`;
+                            }
+                        } catch (authErr) {
+                            console.warn("Firebase anonymous sign-in failed", authErr);
+                        }
+                    }
                     const res = await fetch("/api/onboarding", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers,
                         body: JSON.stringify(payload)
                     });
                     const data = await res.json();
