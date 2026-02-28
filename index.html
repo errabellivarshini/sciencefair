@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -438,9 +438,9 @@
             transform: translateX(30px);
         }
         .ui-select {
-            appearance: none;
-            -webkit-appearance: none;
             -moz-appearance: none;
+            -webkit-appearance: none;
+            appearance: none;
             background-color: #ffffff;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
@@ -583,6 +583,136 @@
         .irrigation-action-btn:hover {
             background: #059669;
             border-color: #059669;
+        }
+
+        .alert-panel,
+        .alert-history-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .alert-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            background: #f8fafc;
+        }
+
+        .alert-status-pill.safe {
+            color: #166534;
+            border-color: #86efac;
+            background: #dcfce7;
+        }
+
+        .alert-status-pill.warning {
+            color: #854d0e;
+            border-color: #fde68a;
+            background: #fef9c3;
+        }
+
+        .alert-status-pill.critical {
+            color: #991b1b;
+            border-color: #fecaca;
+            background: #fee2e2;
+        }
+
+        .alert-item {
+            border-radius: 12px;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            margin-top: 8px;
+            background: #ffffff;
+        }
+
+        .alert-item.low {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .alert-item.medium {
+            border-color: #fde68a;
+            background: #fffbeb;
+        }
+
+        .alert-item.high {
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .alert-title {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .alert-message {
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .predictive-warning {
+            margin-top: 10px;
+            border: 1px solid #fcd34d;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .alert-toast-wrap {
+            position: fixed;
+            top: 92px;
+            right: 18px;
+            z-index: 1200;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .alert-toast {
+            min-width: 300px;
+            max-width: 380px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.2);
+            padding: 12px 14px;
+            background: #ffffff;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .alert-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .alert-toast.high {
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .alert-toast.medium {
+            border-color: #fde68a;
+            background: #fffbeb;
+        }
+
+        .alert-toast.low {
+            border-color: #86efac;
+            background: #f0fdf4;
         }
         
         /* Voice & Language Controls */
@@ -1064,6 +1194,59 @@
             70% { transform: scale(1.12); opacity: 0; }
             100% { transform: scale(1.12); opacity: 0; }
         }
+
+        .app-header-surface {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .panel-secondary-bg {
+            background: var(--bg-secondary);
+        }
+
+        .chat-quick-actions {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .hidden-select {
+            display: none;
+        }
+
+        .robot-iframe-zoom {
+            width: 120%;
+            height: 120%;
+            position: absolute;
+            top: -10%;
+            left: -10%;
+        }
+
+        .no-animation {
+            animation: none;
+        }
+
+        .moisture-radial-default {
+            --value: 72;
+            --accent-color: var(--accent-secondary);
+        }
+
+        .ph-radial-default {
+            --value: 68;
+            --accent-color: var(--accent-primary);
+        }
+
+        .temp-radial-default {
+            --value: 60;
+            --accent-color: #f39c12;
+        }
+
+        .nitrogen-radial-default {
+            --value: 55;
+            --accent-color: #e74c3c;
+        }
+
+        .soil-drainage-color {
+            color: #38bdf8;
+        }
         
         /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
@@ -1084,7 +1267,7 @@
     <div id="particles"></div>
     
     <!-- Header -->
-    <header id="appHeader" class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-md border-b border-[var(--border-color)]" style="background: rgba(255, 255, 255, 0.8);">
+    <header id="appHeader" class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-md border-b border-[var(--border-color)] app-header-surface">
         <div class="w-full px-6 py-4 flex items-center justify-between">
             <div class="header-brand flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center shadow-lg shadow-[var(--shadow-color)]">
@@ -1136,6 +1319,14 @@
                         <path d="M9 17a3 3 0 0 0 6 0"/>
                     </svg>
                 </button>
+                <button class="weather-btn" id="logoutBtn" title="Logout" aria-label="Logout">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--text-primary)]">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <path d="M16 17l5-5-5-5"></path>
+                        <path d="M21 12H9"></path>
+                    </svg>
+                    <span class="hidden sm:inline">Logout</span>
+                </button>
                 <div class="status-badge status-online">
                     <span class="indicator-dot bg-[var(--accent-primary)]"></span>
                     <span data-i18n="status_optimal">Optimal</span>
@@ -1151,7 +1342,7 @@
             <span class="text-sm text-[var(--accent-primary)]" id="weatherUpdated" data-i18n="weather_updating">Loading...</span>
         </div>
 
-        <div class="flex items-center gap-4 mb-3 p-4 rounded-xl" style="background: var(--bg-secondary);">
+        <div class="flex items-center gap-4 mb-3 p-4 rounded-xl panel-secondary-bg">
             <div class="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                     <circle cx="12" cy="12" r="5"/>
@@ -1166,17 +1357,17 @@
         </div>
 
         <div class="grid grid-cols-3 gap-3 mb-6">
-            <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
+            <div class="text-center p-3 rounded-xl panel-secondary-bg">
                 <div class="text-2xl mb-1">H</div>
                 <div class="text-lg font-bold text-[var(--text-primary)]" id="weatherHumidity">--%</div>
                 <div class="text-xs text-text-secondary" data-i18n="weather_humidity">Humidity</div>
             </div>
-            <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
+            <div class="text-center p-3 rounded-xl panel-secondary-bg">
                 <div class="text-2xl mb-1">R</div>
                 <div class="text-lg font-bold text-[var(--text-primary)]" id="weatherRain">--%</div>
                 <div class="text-xs text-text-secondary" data-i18n="weather_rain_chance">Rain chance</div>
             </div>
-            <div class="text-center p-3 rounded-xl" style="background: var(--bg-secondary);">
+            <div class="text-center p-3 rounded-xl panel-secondary-bg">
                 <div class="text-2xl mb-1">W</div>
                 <div class="text-lg font-bold text-[var(--text-primary)]" id="weatherWind">-- km/h</div>
                 <div class="text-xs text-text-secondary" data-i18n="weather_wind">Wind</div>
@@ -1240,11 +1431,9 @@
                 <!-- Left Side: Robot -->
                 <div>
                     <!-- Robot Container -->
-                    <div class="p-0 overflow-hidden rounded-3xl" style="background: transparent;">
+                    <div class="p-0 overflow-hidden rounded-3xl bg-transparent">
                         <div id="robot-container">
-                            <iframe src='https://my.spline.design/nexbotrobotcharacterconcept-Q620C5zdED1vu7AtoC0Gw4Bo/' frameborder='0' width='100%' height='100%'></iframe>
-                            <!-- Cover Spline Branding -->
-                            <div style="position: absolute; bottom: 0; right: 0; width: 160px; height: 60px; background: var(--bg-primary); z-index: 50; pointer-events: none;"></div>
+                            <iframe src='https://my.spline.design/nexbotrobotcharacterconcept-Q620C5zdED1vu7AtoC0Gw4Bo/' frameborder='0' width='100%' height='100%' class="robot-iframe-zoom" title="Interactive farm assistant model" aria-label="Interactive farm assistant model"></iframe>
                         </div>
                     </div>
                 </div>
@@ -1262,14 +1451,14 @@
                                 <h3 class="font-display font-bold text-[var(--text-primary)]" data-i18n="chat_title">AI Field Advisor</h3>
                                 <p class="text-xs text-[var(--accent-primary)]" data-i18n="chat_ready">Ready for your questions.</p>
                             </div>
-                            <select id="langSelect" class="lang-select ui-select">
+                            <select id="langSelect" class="lang-select ui-select" title="Choose language" aria-label="Choose language">
                                 <option value="en-US">English</option>
                                 <option value="hi-IN">Hindi (हिंदी)</option>
                                 <option value="te-IN">Telugu (తెలుగు)</option>
                                 <option value="ta-IN">Tamil (தமிழ்)</option>
                                 <option value="kn-IN">Kannada (ಕನ್ನಡ)</option>
                             </select>
-                            <select id="teluguStyle" class="dialect-select ui-select" style="display:none;">
+                            <select id="teluguStyle" class="dialect-select ui-select hidden-select" title="Choose Telugu speaking style" aria-label="Choose Telugu speaking style">
                                 <option value="standard">Telugu: Standard (easy)</option>
                                 <option value="telangana">Telugu: Telangana slang</option>
                                 <option value="andhra">Telugu: Andhra slang</option>
@@ -1283,7 +1472,7 @@
                     </div>
                     
                     <!-- Quick Actions -->
-                    <div class="px-5 py-3 flex gap-2 overflow-x-auto" style="background: var(--bg-card); border-top: 1px solid var(--border-color);">
+                    <div class="px-5 py-3 flex gap-2 overflow-x-auto chat-quick-actions">
                         <button class="quick-action" onclick="quickQuestion('q_crop')" data-i18n="quick_crop_suggestions">Crop suggestions</button>
                         <button class="quick-action" onclick="quickQuestion('q_soil_health')" data-i18n="quick_soil_health">Soil health</button>
                         <button class="quick-action" onclick="quickQuestion('q_rain')" data-i18n="quick_rain_forecast">Rain forecast</button>
@@ -1307,7 +1496,7 @@
                                 </svg>
                             </button>
                             <input type="text" class="chat-input" id="chatInput" placeholder="Ask about crops, soil, weather..." autocomplete="off" data-i18n-placeholder="chat_input_placeholder">
-                            <button type="submit" class="send-btn">
+                            <button type="submit" class="send-btn" title="Send message" aria-label="Send message">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
                                 </svg>
@@ -1324,7 +1513,7 @@
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="font-display text-lg font-bold text-[var(--text-primary)]" data-i18n="field_conditions">Live Field Conditions</h3>
                         <span class="text-xs text-[var(--accent-primary)] flex items-center gap-2">
-                            <span class="indicator-dot bg-[var(--accent-primary)]" style="animation: none;"></span>
+                            <span class="indicator-dot bg-[var(--accent-primary)] no-animation"></span>
                             <span data-i18n="live_feed">Live Feed</span>
                         </span>
                     </div>
@@ -1332,7 +1521,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <!-- Soil Moisture -->
                         <div class="flex items-center gap-3">
-                            <div id="moistureRadial" class="radial-progress" style="--value: 72; --accent-color: var(--accent-secondary);">
+                            <div id="moistureRadial" class="radial-progress moisture-radial-default">
                                 <div class="radial-progress-content">
                                     <div id="moistureValue" class="radial-progress-value">72%</div>
                                 </div>
@@ -1344,7 +1533,7 @@
                         </div>
                         <!-- Soil pH -->
                         <div class="flex items-center gap-3">
-                            <div id="phRadial" class="radial-progress" style="--value: 68; --accent-color: var(--accent-primary);">
+                            <div id="phRadial" class="radial-progress ph-radial-default">
                                 <div class="radial-progress-content">
                                     <div id="phValue" class="radial-progress-value">6.8</div>
                                 </div>
@@ -1356,7 +1545,7 @@
                         </div>
                         <!-- Soil Temperature -->
                         <div class="flex items-center gap-3">
-                            <div id="tempRadial" class="radial-progress" style="--value: 60; --accent-color: #f39c12;">
+                            <div id="tempRadial" class="radial-progress temp-radial-default">
                                 <div class="radial-progress-content">
                                     <div id="tempValue" class="radial-progress-value">24C</div>
                                 </div>
@@ -1368,7 +1557,7 @@
                         </div>
                         <!-- Nitrogen Level -->
                         <div class="flex items-center gap-3">
-                            <div id="nitrogenRadial" class="radial-progress" style="--value: 55; --accent-color: #e74c3c;">
+                            <div id="nitrogenRadial" class="radial-progress nitrogen-radial-default">
                                 <div class="radial-progress-content">
                                     <div id="nitrogenValue" class="radial-progress-value">Med</div>
                                 </div>
@@ -1379,9 +1568,24 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="alert-panel" id="alertPanel">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-semibold text-[var(--text-primary)]">Smart Alerts</h4>
+                                <span id="alertStatusBadge" class="alert-status-pill safe">Green = Safe</span>
+                            </div>
+                            <div id="predictiveWarning" class="predictive-warning hidden"></div>
+                            <div id="activeAlerts" class="mt-3 text-sm text-text-secondary">No active alerts.</div>
+                        </div>
+                        <div class="alert-history-card">
+                            <h4 class="font-semibold text-[var(--text-primary)]">Alert History</h4>
+                            <div id="alertHistoryList" class="mt-3 text-sm text-text-secondary">No alert history yet.</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="irrigation-card" id="irrigationControl">
+                <div class="irrigation-card hidden" id="irrigationControl">
                     <div class="flex items-center justify-between mb-5">
                         <div class="flex items-center gap-3">
                             <div><h3 class="irrigation-heading" data-i18n="irrigation_control">Irrigation Control</h3><div class="irrigation-subtitle" data-i18n="irrigation_subtitle">Smart valve automation with soil-based calibration</div></div>
@@ -1405,7 +1609,7 @@
 
                             <div>
                                 <div class="irrigation-label" data-i18n="soil_calibration">SOIL CALIBRATION</div>
-                                <select id="soilCalibrationSelect" class="irrigation-select ui-select">
+                                <select id="soilCalibrationSelect" class="irrigation-select ui-select" title="Choose soil calibration type" aria-label="Choose soil calibration type">
                                     <option value="sandy" data-i18n="soil_sandy">Sandy Soil</option>
                                     <option value="loamy" data-i18n="soil_loamy">Loamy Soil</option>
                                     <option value="clay" data-i18n="soil_clay">Clay Soil</option>
@@ -1420,7 +1624,7 @@
                                 </div>
                                 <div class="irrigation-metric">
                                     <div class="irrigation-metric-title" data-i18n="drainage">Drainage</div>
-                                    <div id="soilDrainage" class="irrigation-metric-value" style="color:#38bdf8;">Fast</div>
+                                    <div id="soilDrainage" class="irrigation-metric-value soil-drainage-color">Fast</div>
                                 </div>
                             </div>
                         </div>
@@ -1533,7 +1737,11 @@
         const API_BASE_URL = resolveApiBaseUrl();
         const CHAT_API_URL = API_BASE_URL + '/api/chat';
         const SENSOR_API_URL = API_BASE_URL + '/data';
+        const ALERT_LIVE_API_URL = API_BASE_URL + '/api/alerts/live';
+        const ALERT_HISTORY_API_URL = API_BASE_URL + '/api/alerts/history?limit=20';
         const recordsToggle = document.getElementById('recordsToggle');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const isDashboardPage = window.location.pathname.startsWith('/dashboard');
         const i18n = {
             "en-US": {
                 brand_title: "Agrisense",
@@ -1995,6 +2203,10 @@
         const mainValveState = document.getElementById('mainValveState');
         const mainValveReason = document.getElementById('mainValveReason');
         const irrigationControl = document.getElementById('irrigationControl');
+        const alertStatusBadge = document.getElementById('alertStatusBadge');
+        const activeAlerts = document.getElementById('activeAlerts');
+        const predictiveWarning = document.getElementById('predictiveWarning');
+        const alertHistoryList = document.getElementById('alertHistoryList');
         let liveMoisture = 72;
         let sensorOnline = false;
         const soilProfiles = {
@@ -2071,6 +2283,126 @@
                     : t('irrigation_auto_closed', { moisture: Math.round(liveMoisture) });
             } else {
                 mainValveReason.textContent = t('irrigation_manual_active');
+            }
+        }
+
+        function severityClass(severity) {
+            const value = String(severity || '').toLowerCase();
+            if (value === 'high') return 'high';
+            if (value === 'medium') return 'medium';
+            return 'low';
+        }
+
+        function setAlertStatus(status) {
+            if (!alertStatusBadge) return;
+            const normalized = String(status || 'Safe').toLowerCase();
+            alertStatusBadge.classList.remove('safe', 'warning', 'critical');
+            if (normalized === 'critical') {
+                alertStatusBadge.classList.add('critical');
+                alertStatusBadge.textContent = 'Red = Critical';
+                return;
+            }
+            if (normalized === 'warning') {
+                alertStatusBadge.classList.add('warning');
+                alertStatusBadge.textContent = 'Yellow = Warning';
+                return;
+            }
+            alertStatusBadge.classList.add('safe');
+            alertStatusBadge.textContent = 'Green = Safe';
+        }
+
+        function renderActiveAlerts(alerts) {
+            if (!activeAlerts) return;
+            if (!Array.isArray(alerts) || !alerts.length) {
+                activeAlerts.textContent = 'No active alerts.';
+                return;
+            }
+            activeAlerts.innerHTML = alerts.map((alert) => `
+                <div class="alert-item ${severityClass(alert.severity)}">
+                    <div class="alert-title">${alert.title || 'Alert'} (${alert.severity || 'Low'})</div>
+                    <div class="alert-message">${alert.message || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderPredictiveWarning(alerts) {
+            if (!predictiveWarning) return;
+            const predictive = (alerts || []).find((alert) => String(alert.code || '').includes('preventive') || String(alert.code || '').includes('waterlogging'));
+            if (!predictive) {
+                predictiveWarning.classList.add('hidden');
+                predictiveWarning.textContent = '';
+                return;
+            }
+            predictiveWarning.classList.remove('hidden');
+            predictiveWarning.textContent = `Predictive warning: ${predictive.message || predictive.title || 'Risk detected.'}`;
+        }
+
+        function formatAlertTimestamp(value) {
+            if (!value) return '';
+            const parsed = new Date(String(value).replace(' ', 'T') + 'Z');
+            if (Number.isNaN(parsed.getTime())) return String(value);
+            return parsed.toLocaleString();
+        }
+
+        function renderAlertHistory(history) {
+            if (!alertHistoryList) return;
+            if (!Array.isArray(history) || !history.length) {
+                alertHistoryList.textContent = 'No alert history yet.';
+                return;
+            }
+            alertHistoryList.innerHTML = history.slice(0, 8).map((row) => `
+                <div class="alert-item ${severityClass(row.severity)}">
+                    <div class="alert-title">${row.title || 'Alert'} (${row.severity || 'Low'})</div>
+                    <div class="alert-message">${row.message || ''}</div>
+                    <div class="text-[11px] text-text-secondary mt-1">${formatAlertTimestamp(row.created_at)}</div>
+                </div>
+            `).join('');
+        }
+
+        function ensureToastWrap() {
+            let wrap = document.getElementById('alertToastWrap');
+            if (wrap) return wrap;
+            wrap = document.createElement('div');
+            wrap.id = 'alertToastWrap';
+            wrap.className = 'alert-toast-wrap';
+            document.body.appendChild(wrap);
+            return wrap;
+        }
+
+        function showAlertPopup(alert) {
+            if (!alert || !alert.message) return;
+            const wrap = ensureToastWrap();
+            const toast = document.createElement('div');
+            toast.className = `alert-toast ${severityClass(alert.severity)} show`;
+            toast.innerHTML = `
+                <div class="alert-title">${alert.title || 'Alert'} (${alert.severity || 'Low'})</div>
+                <div class="alert-message">${alert.message}</div>
+            `;
+            wrap.appendChild(toast);
+            setTimeout(() => toast.classList.remove('show'), 4000);
+            setTimeout(() => toast.remove(), 4300);
+        }
+
+        async function fetchAlertsPanel() {
+            try {
+                const [liveRes, historyRes] = await Promise.all([
+                    fetch(ALERT_LIVE_API_URL),
+                    fetch(ALERT_HISTORY_API_URL)
+                ]);
+                const live = await parseJsonSafe(liveRes) || {};
+                const historyPayload = await parseJsonSafe(historyRes) || {};
+                setAlertStatus(live.status || 'Safe');
+                renderActiveAlerts(live.alerts || []);
+                renderPredictiveWarning(live.alerts || []);
+                renderAlertHistory(historyPayload.history || []);
+                const popupCandidate = (live.alerts || []).find((a) => String(a.severity || '').toLowerCase() === 'high')
+                    || (live.alerts || []).find((a) => String(a.severity || '').toLowerCase() === 'medium')
+                    || (live.alerts || [])[0];
+                if (popupCandidate) {
+                    showAlertPopup(popupCandidate);
+                }
+            } catch (error) {
+                console.error('Alert panel update failed', error);
             }
         }
 
@@ -2223,6 +2555,12 @@
 
             if (command.includes('dash') || command.includes('soil') || command.includes('field')) {
                 weatherPanel.classList.remove('active');
+                if (!isDashboardPage) {
+                    const selectedLang = encodeURIComponent(langSelect.value || 'en-US');
+                    window.location.href = `/dashboard?lang=${selectedLang}`;
+                    return true;
+                }
+                setIrrigationVisibility(true);
                 dashboardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 return true;
             }
@@ -2243,12 +2581,24 @@
 
             if (command.includes('irrigation') || command.includes('valve') || command.includes('water')) {
                 weatherPanel.classList.remove('active');
+                if (!isDashboardPage) {
+                    const selectedLang = encodeURIComponent(langSelect.value || 'en-US');
+                    window.location.href = `/dashboard?lang=${selectedLang}`;
+                    return true;
+                }
+                setIrrigationVisibility(true);
                 irrigationControl.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 return true;
             }
 
             if (command.includes('home') || command.includes('top') || command.includes('start')) {
                 weatherPanel.classList.remove('active');
+                if (isDashboardPage) {
+                    const selectedLang = encodeURIComponent(langSelect.value || 'en-US');
+                    window.location.href = `/?lang=${selectedLang}`;
+                    return true;
+                }
+                setIrrigationVisibility(false);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return true;
             }
@@ -2256,16 +2606,36 @@
             return false;
         }
         
+        function setIrrigationVisibility(showOnDashboard) {
+            if (!irrigationControl) return;
+            irrigationControl.classList.toggle('hidden', !showOnDashboard);
+        }
+
+        setIrrigationVisibility(isDashboardPage);
+
         dashboardToggle.addEventListener('click', () => {
+            const selectedLang = encodeURIComponent(langSelect.value || 'en-US');
+            if (!isDashboardPage) {
+                window.location.href = `/dashboard?lang=${selectedLang}`;
+                return;
+            }
             if (weatherPanel.classList.contains('active')) {
                 weatherPanel.classList.remove('active');
             }
+            setIrrigationVisibility(true);
             irrigationControl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
         if (recordsToggle) {
             recordsToggle.addEventListener('click', () => {
                 const selectedLang = encodeURIComponent(langSelect.value || 'en-US');
                 window.location.href = `/records?lang=${selectedLang}`;
+            });
+        }
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                window.localStorage.removeItem(LANGUAGE_STORAGE_KEY);
+                window.localStorage.removeItem('AGROBOT_API_BASE_URL');
+                window.location.href = '/onboarding';
             });
         }
 
@@ -2387,6 +2757,8 @@
 
         updateSoilData();
         setInterval(updateSoilData, 5000);
+        fetchAlertsPanel();
+        setInterval(fetchAlertsPanel, 5 * 1000);
         // Floating particles
         function createParticles() {
             const container = document.getElementById('particles');

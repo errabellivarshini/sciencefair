@@ -209,6 +209,111 @@
             position: relative;
         }
 
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(2px);
+            z-index: 60;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .paper-modal {
+            width: min(92vw, 760px);
+            max-height: 90vh;
+            overflow: auto;
+            background: linear-gradient(180deg, #fff 0%, #fdfdfd 100%);
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 22px 45px rgba(15, 23, 42, 0.22);
+            transform: translateY(10px) scale(0.98);
+            opacity: 0;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+        .modal-overlay.open .paper-modal {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        .paper-header {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(6px);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+        }
+        .paper-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #1f2937;
+        }
+        .paper-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-btn {
+            border: 1px solid #d1d5db;
+            background: #fff;
+            color: #334155;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .modal-btn:hover {
+            border-color: #9ca3af;
+        }
+        .modal-btn.download {
+            border-color: #a7f3d0;
+            color: #047857;
+            background: #ecfdf5;
+        }
+        .paper-body {
+            padding: 16px;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .detail-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .detail-label {
+            font-size: 0.78rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        .detail-value {
+            color: #0f172a;
+            font-weight: 700;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
         @media (max-width: 900px) {
             .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .dashboard-card { padding: 0; }
@@ -226,6 +331,7 @@
             .dashboard-card { border-radius: 0; padding: 0; }
             .chart-box { padding: 12px; }
             .chart-wrap { height: 250px; }
+            .details-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -267,15 +373,15 @@
             <h1 class="title" data-i18n="records_graph_title">Farm Records Graph Model</h1>
 
             <div class="year-selector">
-                <div class="year-card active" onclick="selectYear(2025, this)">
+                <div class="year-card active" data-year="2025">
                     <h3>2025</h3>
                     <p data-i18n="year_current">Current Year</p>
                 </div>
-                <div class="year-card" onclick="selectYear(2024, this)">
+                <div class="year-card" data-year="2024">
                     <h3>2024</h3>
                     <p data-i18n="year_last">Last Year</p>
                 </div>
-                <div class="year-card" onclick="selectYear(2023, this)">
+                <div class="year-card" data-year="2023">
                     <h3>2023</h3>
                     <p data-i18n="year_archive">Archive</p>
                 </div>
@@ -314,6 +420,28 @@
             </div>
         </section>
     </main>
+
+    <div class="modal-overlay" id="recordModal" aria-hidden="true">
+        <div class="paper-modal" role="dialog" aria-modal="true" aria-labelledby="recordModalTitle">
+            <div class="paper-header">
+                <div class="paper-title" id="recordModalTitle">Farm Details</div>
+                <div class="paper-actions">
+                    <button type="button" class="modal-btn download" id="downloadPdfBtn" title="Download PDF">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 3v12"></path>
+                            <path d="M7 10l5 5 5-5"></path>
+                            <path d="M5 21h14"></path>
+                        </svg>
+                        <span>Download</span>
+                    </button>
+                    <button type="button" class="modal-btn" id="closeModalBtn" aria-label="Close details modal">X</button>
+                </div>
+            </div>
+            <div class="paper-body">
+                <div class="details-grid" id="modalDetailsGrid"></div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const LANGUAGE_STORAGE_KEY = "AGRISENSE_LANG";
@@ -426,11 +554,27 @@
             },
         };
 
-        const dataStore = {
-            2025: { moisture: "68%", health: "77", yield: "12.5t", rain: "950mm" },
-            2024: { moisture: "75%", health: "82", yield: "14.2t", rain: "1100mm" },
-            2023: { moisture: "62%", health: "70", yield: "10.8t", rain: "890mm" }
+        let recordStore = {
+            2025: {
+                year: 2025, farmer_name: "Varshini Reddy", land_area_acres: 6.2, crop_type: "Paddy",
+                total_yield_tons: 12.5, avg_soil_moisture_pct: 68, soil_health_score: 77, total_rainfall_mm: 950,
+                irrigation_method: "Drip Irrigation", fertilizer_used: "NPK 20-20-20",
+                profit_loss_summary: "Profit of INR 1,85,000 after seasonal costs."
+            },
+            2024: {
+                year: 2024, farmer_name: "Varshini Reddy", land_area_acres: 6.0, crop_type: "Maize",
+                total_yield_tons: 14.2, avg_soil_moisture_pct: 75, soil_health_score: 82, total_rainfall_mm: 1100,
+                irrigation_method: "Sprinkler", fertilizer_used: "Urea + DAP",
+                profit_loss_summary: "Profit of INR 2,10,000 driven by strong yield."
+            },
+            2023: {
+                year: 2023, farmer_name: "Varshini Reddy", land_area_acres: 5.8, crop_type: "Groundnut",
+                total_yield_tons: 10.8, avg_soil_moisture_pct: 62, soil_health_score: 70, total_rainfall_mm: 890,
+                irrigation_method: "Canal + Supplemental Drip", fertilizer_used: "Organic Compost + NPK 10-26-26",
+                profit_loss_summary: "Minor loss of INR 22,000 due to low rainfall period."
+            }
         };
+        let selectedYear = 2025;
 
         const chartData = {
             years: ["2023", "2024", "2025"],
@@ -482,14 +626,128 @@
             window.localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLanguage);
         }
 
+        function toStats(record) {
+            return {
+                moisture: `${Number(record.avg_soil_moisture_pct || 0)}%`,
+                health: `${Number(record.soil_health_score || 0)}/100`,
+                yield: `${Number(record.total_yield_tons || 0)}t`,
+                rain: `${Number(record.total_rainfall_mm || 0)}mm`
+            };
+        }
+
+        function renderStats(year) {
+            const record = recordStore[year];
+            if (!record) return;
+            const stats = toStats(record);
+            document.getElementById("stat-moisture").textContent = stats.moisture;
+            document.getElementById("stat-health").textContent = stats.health;
+            document.getElementById("stat-yield").textContent = stats.yield;
+            document.getElementById("stat-rain").textContent = stats.rain;
+        }
+
+        function updateChartFromRecords() {
+            const orderedYears = Object.keys(recordStore).sort();
+            if (orderedYears.length < 1) return;
+            chartData.years = orderedYears;
+            chartData.moisture = orderedYears.map((year) => Number(recordStore[year].avg_soil_moisture_pct || 0));
+            chartData.health = orderedYears.map((year) => Number(recordStore[year].soil_health_score || 0));
+            if (chartInstance) {
+                chartInstance.data.labels = chartData.years;
+                const activeMode = document.getElementById("sw-health").classList.contains("active") ? "health" : "moisture";
+                chartInstance.data.datasets[0].data = chartData[activeMode];
+                chartInstance.update();
+            }
+        }
+
+        function detailItems(record) {
+            return [
+                ["Year", record.year],
+                ["Farmer Name", record.farmer_name],
+                ["Land Area (acres)", record.land_area_acres],
+                ["Crop Type", record.crop_type],
+                ["Total Yield (tons)", record.total_yield_tons],
+                ["Average Soil Moisture (%)", record.avg_soil_moisture_pct],
+                ["Soil Health Score", record.soil_health_score],
+                ["Total Rainfall (mm)", record.total_rainfall_mm],
+                ["Irrigation Method", record.irrigation_method],
+                ["Fertilizer Used", record.fertilizer_used],
+                ["Profit/Loss Summary", record.profit_loss_summary]
+            ];
+        }
+
+        function openRecordModal(year) {
+            const modal = document.getElementById("recordModal");
+            const grid = document.getElementById("modalDetailsGrid");
+            const title = document.getElementById("recordModalTitle");
+            const record = recordStore[year];
+            if (!record || !modal || !grid || !title) return;
+
+            title.textContent = `Farm Details - ${year}`;
+            grid.innerHTML = detailItems(record).map(([label, value]) => (
+                `<div class="detail-item">
+                    <div class="detail-label">${label}</div>
+                    <div class="detail-value">${value ?? "N/A"}</div>
+                </div>`
+            )).join("");
+            modal.classList.add("open");
+            modal.setAttribute("aria-hidden", "false");
+        }
+
+        function closeRecordModal() {
+            const modal = document.getElementById("recordModal");
+            if (!modal) return;
+            modal.classList.remove("open");
+            modal.setAttribute("aria-hidden", "true");
+        }
+
         function selectYear(year, element) {
+            selectedYear = Number(year);
             document.querySelectorAll(".year-card").forEach((el) => el.classList.remove("active"));
-            element.classList.add("active");
-            const data = dataStore[year];
-            document.getElementById("stat-moisture").textContent = data.moisture;
-            document.getElementById("stat-health").textContent = `${data.health}/100`;
-            document.getElementById("stat-yield").textContent = data.yield;
-            document.getElementById("stat-rain").textContent = data.rain;
+            if (element) element.classList.add("active");
+            renderStats(selectedYear);
+            openRecordModal(selectedYear);
+        }
+
+        async function loadFarmRecords() {
+            try {
+                const response = await fetch("/api/farm-records");
+                if (!response.ok) return;
+                const payload = await response.json();
+                if (payload && typeof payload === "object") {
+                    recordStore = payload;
+                }
+            } catch (error) {
+                console.error("Could not load farm records from API:", error);
+            }
+        }
+
+        function initYearCards() {
+            document.querySelectorAll(".year-card").forEach((card) => {
+                card.addEventListener("click", () => {
+                    const year = Number(card.getAttribute("data-year"));
+                    selectYear(year, card);
+                });
+            });
+        }
+
+        function initModalHandlers() {
+            const modal = document.getElementById("recordModal");
+            const closeBtn = document.getElementById("closeModalBtn");
+            const downloadBtn = document.getElementById("downloadPdfBtn");
+            if (closeBtn) closeBtn.addEventListener("click", closeRecordModal);
+            if (modal) {
+                modal.addEventListener("click", (event) => {
+                    if (event.target === modal) closeRecordModal();
+                });
+            }
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") closeRecordModal();
+            });
+            if (downloadBtn) {
+                downloadBtn.addEventListener("click", () => {
+                    window.location.href = `/api/farm-records/${selectedYear}/pdf`;
+                });
+            }
         }
 
         function initChart() {
@@ -529,9 +787,18 @@
             chartInstance.update();
         }
 
-        window.onload = () => {
+        window.onload = async () => {
             restoreLanguage();
+            await loadFarmRecords();
             initChart();
+            updateChartFromRecords();
+            initYearCards();
+            initModalHandlers();
+            const defaultCard = document.querySelector('.year-card[data-year="2025"]') || document.querySelector(".year-card");
+            if (defaultCard) {
+                selectYear(Number(defaultCard.getAttribute("data-year")), defaultCard);
+                closeRecordModal();
+            }
             applyTranslations();
         };
     </script>
