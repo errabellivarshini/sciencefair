@@ -2748,6 +2748,7 @@
             document.getElementById('nitrogenRadial').style.setProperty('--value', nitrogen.toFixed(0));
             updateIrrigationUI();
         }
+        window.applySoilData = applySoilData;
 
         async function updateSoilData() {
             try {
@@ -2829,6 +2830,46 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
         import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+        let firebaseApp = null;
+        let realtimeSubscribed = false;
+
+        async function getFirebaseConfig() {
+            const configRes = await fetch("/api/push/config");
+            return await configRes.json();
+        }
+
+        async function ensureFirebaseApp() {
+            if (firebaseApp) return firebaseApp;
+            const configPayload = await getFirebaseConfig();
+            const cfg = configPayload?.config || {};
+            const required = ["apiKey", "projectId", "appId"];
+            const missing = required.filter((k) => !String(cfg[k] || "").trim());
+            if (missing.length) {
+                throw new Error(`Firebase config missing: ${missing.join(", ")}`);
+            }
+            firebaseApp = initializeApp(cfg);
+            return firebaseApp;
+        }
+
+        async function initRealtimeSensorSync() {
+            if (realtimeSubscribed) return;
+            const app = await ensureFirebaseApp();
+            const db = getDatabase(app);
+            const liveRef = ref(db, "/live/sensor");
+            onValue(liveRef, (snapshot) => {
+                const payload = snapshot?.val();
+                if (payload && typeof window.applySoilData === "function") {
+                    window.applySoilData(payload, true);
+                }
+            });
+            realtimeSubscribed = true;
+        }
+
+        initRealtimeSensorSync().catch((err) => {
+            console.warn("Realtime sensor sync unavailable, using HTTP polling fallback.", err);
+        });
 
         const pushButton = document.getElementById("pushToggle");
         if (pushButton) {
@@ -2842,8 +2883,7 @@
                     return;
                 }
 
-                const configRes = await fetch("/api/push/config");
-                const configPayload = await configRes.json();
+                const configPayload = await getFirebaseConfig();
                 if (!configPayload.enabled) {
                     alert("Push is not configured on server. Set Firebase env variables first.");
                     return;
@@ -2856,7 +2896,7 @@
                 }
 
                 const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
-                const app = initializeApp(configPayload.config);
+                const app = await ensureFirebaseApp();
                 const messaging = getMessaging(app);
                 const token = await getToken(messaging, {
                     vapidKey: configPayload.config.vapidKey,

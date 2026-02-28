@@ -1,5 +1,6 @@
 import os
 import json
+import base64
 import importlib
 import time
 import threading
@@ -17,11 +18,13 @@ try:
     credentials = importlib.import_module("firebase_admin.credentials")
     messaging = importlib.import_module("firebase_admin.messaging")
     firestore = importlib.import_module("firebase_admin.firestore")
+    firebase_db = importlib.import_module("firebase_admin.db")
 except Exception:  # noqa: BLE001
     firebase_admin = None
     credentials = None
     messaging = None
     firestore = None
+    firebase_db = None
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -105,6 +108,7 @@ def _push_config() -> dict:
         "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET", "agrisens-fca57.firebasestorage.app").strip(),
         "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID", "643022334969").strip(),
         "appId": os.getenv("FIREBASE_APP_ID", "1:643022334969:web:7e842a6b4a0a5125fd6b28").strip(),
+        "databaseURL": os.getenv("FIREBASE_DATABASE_URL", "https://agrisens-fca57-default-rtdb.firebaseio.com").strip(),
         "vapidKey": os.getenv("FIREBASE_VAPID_KEY", "").strip(),
     }
 
@@ -648,17 +652,37 @@ def _firebase_ready() -> tuple[bool, str]:
 
     service_account_file = os.getenv("FIREBASE_SERVICE_ACCOUNT_FILE", "").strip()
     service_account_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip()
+    service_account_json_b64 = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON_B64", "").strip()
     project_id = os.getenv("FIREBASE_PROJECT_ID", "agrisens-fca57").strip() or "agrisens-fca57"
+    database_url = os.getenv("FIREBASE_DATABASE_URL", "https://agrisens-fca57-default-rtdb.firebaseio.com").strip()
+    app_options = {"projectId": project_id}
+    if database_url:
+        app_options["databaseURL"] = database_url
     if not firebase_admin._apps:  # type: ignore[attr-defined]
+        parsed_credentials: dict | None = None
         if service_account_json:
             try:
-                parsed_credentials = json.loads(service_account_json)
-                if not isinstance(parsed_credentials, dict):
+                candidate = json.loads(service_account_json)
+                if isinstance(candidate, dict):
+                    parsed_credentials = candidate
+                else:
                     return False, "FIREBASE_SERVICE_ACCOUNT_JSON is not a valid JSON object."
             except Exception as exc:  # noqa: BLE001
                 return False, f"Unable to parse FIREBASE_SERVICE_ACCOUNT_JSON: {exc}"
+        elif service_account_json_b64:
+            try:
+                decoded = base64.b64decode(service_account_json_b64).decode("utf-8")
+                candidate = json.loads(decoded)
+                if isinstance(candidate, dict):
+                    parsed_credentials = candidate
+                else:
+                    return False, "FIREBASE_SERVICE_ACCOUNT_JSON_B64 is not a valid encoded JSON object."
+            except Exception as exc:  # noqa: BLE001
+                return False, f"Unable to parse FIREBASE_SERVICE_ACCOUNT_JSON_B64: {exc}"
+
+        if parsed_credentials is not None:
             cred = credentials.Certificate(parsed_credentials)
-            firebase_admin.initialize_app(cred, {"projectId": project_id})
+            firebase_admin.initialize_app(cred, app_options)
         elif service_account_file:
             service_account_path = Path(service_account_file)
             if not service_account_path.is_absolute():
@@ -666,17 +690,18 @@ def _firebase_ready() -> tuple[bool, str]:
             if not service_account_path.exists():
                 return False, f"Service account file not found: {service_account_path}"
             cred = credentials.Certificate(str(service_account_path))
-            firebase_admin.initialize_app(cred, {"projectId": project_id})
+            firebase_admin.initialize_app(cred, app_options)
         else:
             # Fallback to Application Default Credentials when available.
             try:
-                firebase_admin.initialize_app(options={"projectId": project_id})
+                firebase_admin.initialize_app(options=app_options)
             except Exception:
                 default_path = BASE_DIR / "firebase-service-account.json"
                 return (
                     False,
                     "Firebase credentials are not configured and ADC is unavailable. "
-                    "Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_SERVICE_ACCOUNT_FILE "
+                    "Set FIREBASE_SERVICE_ACCOUNT_JSON (or FIREBASE_SERVICE_ACCOUNT_JSON_B64) "
+                    "or FIREBASE_SERVICE_ACCOUNT_FILE "
                     f"(for example: {default_path}).",
                 )
     return True, ""
@@ -699,7 +724,27 @@ def _firestore_client():
     ok, _ = _firebase_ready()
     if not ok or firestore is None:
         return None
-    return firestore.client()
+    try:
+        return firestore.client()
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _sync_sensor_realtime(sensor_snapshot: dict) -> tuple[bool, str]:
+    ok, reason = _firebase_ready()
+    if not ok:
+        return False, reason
+    if firebase_db is None:
+        return False, "firebase-admin db module is unavailable."
+
+    payload = dict(sensor_snapshot)
+    payload["updated_at"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    payload["updated_at_epoch"] = datetime.utcnow().timestamp()
+    try:
+        firebase_db.reference("/live/sensor").set(payload)
+        return True, ""
+    except Exception as exc:  # noqa: BLE001
+        return False, str(exc)
 
 
 def _init_db() -> bool:
@@ -1267,6 +1312,7 @@ def update_data():
     sensor_data = merged
     _append_sensor_reading(sensor_data)
     firestore_saved, firestore_error = _save_sensor_reading(sensor_data, payload)
+    realtime_saved, realtime_error = _sync_sensor_realtime(sensor_data)
     engine_result = None
     with _alert_engine_lock:
         engine_result = _run_alert_engine_if_due(force=False)
@@ -1277,6 +1323,8 @@ def update_data():
             "data": sensor_data,
             "firestore_saved": firestore_saved,
             "firestore_error": firestore_error,
+            "realtime_saved": realtime_saved,
+            "realtime_error": realtime_error,
             "alert_engine_ran": engine_result is not None,
             "new_alerts": (engine_result or {}).get("new_alerts", []),
         }
@@ -1745,6 +1793,31 @@ def chat():
 @app.get("/health")
 def health():
     return jsonify({"status": "ok"})
+
+
+@app.get("/api/firebase/status")
+def firebase_status():
+    ok, reason = _firebase_ready()
+    using_json = bool(os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip())
+    using_json_b64 = bool(os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON_B64", "").strip())
+    using_file = bool(os.getenv("FIREBASE_SERVICE_ACCOUNT_FILE", "").strip())
+    project_id = os.getenv("FIREBASE_PROJECT_ID", "agrisens-fca57").strip() or "agrisens-fca57"
+    return jsonify(
+        {
+            "ready": ok,
+            "reason": reason,
+            "project_id": project_id,
+            "credential_source": (
+                "service_account_json"
+                if using_json
+                else "service_account_json_b64"
+                if using_json_b64
+                else "service_account_file"
+                if using_file
+                else "adc_or_none"
+            ),
+        }
+    )
 
 
 if __name__ == "__main__":
